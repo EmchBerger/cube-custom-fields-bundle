@@ -1,0 +1,3 @@
+<?php
+
+return require __DIR__.'/vendor/cubetools/cube-common-develop/src/CodeStyle/php_cs_cube.php';

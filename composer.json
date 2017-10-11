@@ -1,0 +1,46 @@
+{
+    "name": "cubetools/cube-custom-fields-bundle",
+    "description": "Custom fields in forms and entities",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CUBE Team of Emch + Berger AG Bern",
+            "homepage": "http://www.cubetools.ch"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "doctrine/orm": "^2.5",
+        "symfony/form": "^2.7|^3.0",
+        "symfony/framework-bundle": "^2.7|^3.0"
+    },
+    "require-dev": {
+        "cubetools/cube-common-develop": "0.*|^1.0.0",
+        "symfony/phpunit-bridge": "^2.7|^3.0"
+    },
+    "autoload": {
+        "psr-4": {"CubeTools\\CubeCustomFieldsBundle\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-4": {"Tests\\CubeTools\\CubeCustomFieldsBundle\\": "tests/"}
+    },
+    "support": {
+        "issues": "https://github.com/EmchBerger/cube-custom-fields-bundle/issues/",
+        "source": "https://github.com/EmchBerger/cube-custom-fields-bundle/"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@cube-post-install-update"
+        ],
+        "post-update-cmd": [
+            "@cube-post-install-update"
+        ],
+        "cube-post-install-update": [
+            "[ -d vendor/cubetools/cube-common-develop ] && vendor/cubetools/cube-common-develop/src/Workplace/netbeans_config_cube.sh"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
