@@ -76,6 +76,33 @@ cube_custom_fields:
     access_rights_table: 'XxBundle:AccessEntity'
 ```
 
+Step X: show fields in the forms
+--------------------------------
+Add the custom fields to your forms.
+```php
+class XxxType extends FormType
+{
+    ...
+    public function buildForm(...)
+    {
+        ...
+        $customFieldsService = $options['customFieldsService']; // or configure your form as a service
+        $customFieldsService->addCustomFields($form);
+    }
+    ...
+}
+
+class XzyController extends Contoller
+{
+    ...
+    public function zxyAction(CubeTools\CubeCustomFieldsBundle\CustomFieldsService $customFieldsService)
+    {
+        // or $customFieldsService = $this->get('cube_custom_fields.form_fields');
+        $form = $this->createForm(XxxType::class, null, array('customFieldsService' => $customFieldsService;
+        ...
+    }
+```
+
 Step X: display the filds
 -------------------------
 TODO

@@ -1,6 +1,15 @@
-#parameters:
+# services for cube_custom_fields_bundle
+#
+# no autoconiguration and autowiring, as suggested by best practice in https://symfony.com/doc/current/bundles/best_practices.html#services
+# with aliases from the class name to allow usage in autowire
 
 services:
+    cube_custom_fields.form_fields:
+        class: CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService
+        arguments:
+            - '%cube_custom_fields.entities'
+    CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
+
     # cube_customfields.service1:
     #     class: CubeTools\CubeCustomFieldsBundle\ClassName
     #     arguments:
