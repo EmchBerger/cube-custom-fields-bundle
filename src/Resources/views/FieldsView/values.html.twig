@@ -1,0 +1,3 @@
+{% for field, config in show %}
+    <td id="col{{ config.ucId }}">{{ values[field]|default('') }}</td>
+{% endfor %}

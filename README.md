@@ -75,3 +75,7 @@ cube_custom_fields:
             ...
     access_rights_table: 'XxBundle:AccessEntity'
 ```
+
+Step X: display the filds
+-------------------------
+TODO
