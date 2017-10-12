@@ -34,4 +34,9 @@ class DatetimeCustomField extends CustomFieldBase
     {
         return $this->dateValue;
     }
+
+    public function __toString()
+    {
+        return $this->dateValue->format('d.m.Y h:i:s'); // TODO really fixed format?
+    }
 }

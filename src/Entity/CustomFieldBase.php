@@ -78,6 +78,16 @@ abstract class CustomFieldBase
     }
 
     /**
+     * Value as string, for showing in view pages,
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->getValue();
+    }
+
+    /**
      * Get value of this custom field.
      *
      * @return many
