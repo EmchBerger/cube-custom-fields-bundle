@@ -43,7 +43,9 @@ class CustomFieldsFormService
         $fields = $this->fieldsConfig[$entityClass];
 
         foreach ($fields as $name => $field) {
-            $options = array();
+            $options = array(
+                'property_path' => "customFields[$name].value",
+            );
             if (isset($field['field_label'])) {
                 $options['label'] = $field['field_label'];
             }
