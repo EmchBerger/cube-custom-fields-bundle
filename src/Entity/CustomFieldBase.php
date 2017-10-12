@@ -68,6 +68,16 @@ abstract class CustomFieldBase
     }
 
     /**
+     * Returns true when the entity (its value) is empty.
+     *
+     * @return boolean
+     */
+    public function isEmpty()
+    {
+        return empty($this->getValue());
+    }
+
+    /**
      * Get value of this custom field.
      *
      * @return many
