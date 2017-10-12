@@ -21,20 +21,20 @@ class CustomFieldsFormService
     /**
      * Add all Custom Fields to the form.
      *
-     * @param FormBuilderInterface $form        the form to add the entities to
-     * @param string               $entityClass entity to set the fields for, only when form is not an EntityType
+     * @param FormBuilderInterface $form      the form to add the entities to
+     * @param string               $dataClass entity to set the fields for, only when forms data_class is not set.
      *
      * @throws \LogicException when wrong configured
      */
-    public function addCustomFields(FormBuilderInterface $form, $entityClass = null)
+    public function addCustomFields(FormBuilderInterface $form, $dataClass = null)
     {
-        $confEntityClass = $form->getFormConfig()->getOption('class');
-        if (null !== $confEntityClass && null !== $entityClass) {
-            throw new \LogicException('Do not set $entityClass is form is an EntityType');
-        } elseif (null !== $confEntityClass) {
-            $entityClass = $confEntityClass;
+        $entityClass = $form->getFormConfig()->getOption('data_class');
+        if (null !== $entityClass && null !== $dataClass && $dataClass !== $entityClass) {
+            throw new \LogicException('Do not set $dataClass if forms option data_class is set.');
+        } elseif (null !== $dataClass) {
+            $entityClass = $dataClass;
         } elseif (null === $entityClass) {
-            throw new \LogicException('Do set $entityClass is form is not an EntityType');
+            throw new \LogicException('Do set $dataClass if form has not option data_class set.');
         }
 
         if (!isset($this->fieldsConfig[$entityClass])) {

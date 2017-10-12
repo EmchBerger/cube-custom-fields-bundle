@@ -42,7 +42,7 @@ class CustomFieldsFormServiceTest extends TestCase
         $form->expects($this->never())->method('add');
 
         $this->setExpectedException(\LogicException::class);
-        $service->addCustomFields($form, 'EntityClass1');
+        $service->addCustomFields($form, 'EntityClass2');
     }
 
     public function testBasicConfig()
@@ -80,7 +80,7 @@ class CustomFieldsFormServiceTest extends TestCase
             ->getMock()
         ;
         $mockConfig->expects($this->any())->method('getOption')
-            ->with($this->equalTo('class'))
+            ->with($this->equalTo('data_class'))
             ->will($this->returnValue($formEntityClass))
         ;
 
