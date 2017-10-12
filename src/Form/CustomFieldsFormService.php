@@ -8,6 +8,12 @@ class CustomFieldsFormService
 {
     private $fieldsConfig = null;
 
+    private $typeMap = array(
+        'text' => TextType::class,
+        'date' => DateType::class,
+        // TODO add more types
+    );
+
     /**
      * Constructor of service.
      *
@@ -49,16 +55,17 @@ class CustomFieldsFormService
             if (isset($field['field_label'])) {
                 $options['label'] = $field['field_label'];
             }
-            switch ($field['field_type']) {
-                case 'text':
-                    $type = TextType::class;
+            $fieldType = $field['field_type'];
+            if (isset($this->typeMap[$fieldType])) {
+                $type = $this->typeMap[$fieldType];
+            } else {
+                throw new \LogicException(sprintf('type %s is not supported by %s', $fieldType, __CLASS__));
+            }
+            switch ($fieldType) {
+                case 'select':
+                    // TODO $options['choices'] = ...
                     break;
-                case 'date':
-                    $type = DateType::class;
-                    break;
-                // TODO add more types
-                default:
-                    throw new \LogicException(sprintf('type %s is not supported by %s', $field['field_type'], __CLASS__));
+                // TODO other special cases
             }
             $form->add($name, $type, $options);
         }
