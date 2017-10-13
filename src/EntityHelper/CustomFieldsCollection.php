@@ -3,29 +3,34 @@
 namespace CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
 use CubeTools\CubeCustomFieldsBundle\Entity;
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Collection for CustomFieldBase entities.
  *
  * Creates new (unsaved) entities if required;
  */
-class CustomFieldsArrayCollection extends ArrayCollection
+class CustomFieldsCollection extends AbstractLazyCollection
 {
     /**
      * {@inheritdoc}
      *
      * {@inheritdoc}
      *
-     * @param array|ArrayCollection $elements
+     * @param array|Doctrine\Common\Collections\Collection $elements
      */
     public function __construct($elements = array())
     {
-        if ($elements instanceof ArrayCollection) {
-            $elements = $elements->toArray();
+        if (is_array($elements)) {
+            $elements = new ArrayCollection($elements);
+        } elseif (! $elements instanceof Collection) {
+            throw new \InvalidArgumentException($elements);
         }
 
-        parent::__construct($elements);
+        $this->collection = $elements;
+        $this->initialized = true;
     }
 
     /**
@@ -133,5 +138,10 @@ class CustomFieldsArrayCollection extends ArrayCollection
         // do not set $entity->setFieldId($tempEntity->getFieldId), is set later anyway
 
         return $entity;
+    }
+
+    protected function doInitialize()
+    {
+        // will never be called, as initialized from beginning
     }
 }

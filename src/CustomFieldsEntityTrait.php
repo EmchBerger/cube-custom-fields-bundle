@@ -2,7 +2,7 @@
 
 namespace CubeTools\CubeCustomFieldsBundle;
 
-use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsArrayCollection;
+use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,8 +44,11 @@ trait CustomFieldsEntityTrait
     public function getCustomFields()
     {
         $fields = $this->customFields;
-        if (! $fields instanceof CustomFieldsArrayCollection) {
-            $fields = new CustomFieldsArrayCollection($fields);
+        if (null === $fields) {
+            $fields = new CustomFieldsCollection();
+            $this->customFields = $fields;
+        } elseif (! $fields instanceof CustomFieldsCollection) {
+            $fields = new CustomFieldsCollection($fields);
             $this->customFields = $fields;
         }
 
