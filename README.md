@@ -53,8 +53,8 @@ Then configure the bundle in `app/config/config.yml` of your project.
 ```yaml
 imports:
     ...
-    { require: custom_fields.yml }
-    # or to ignore when not existing or invalid { require: custom_fields, ignore_errors: true }
+    { resource: custom_fields.yml }
+    # or to ignore when not existing or invalid { resource: custom_fields.yml, ignore_errors: true }
 ```
 
 `app/config/custom_fields.yml`
@@ -78,7 +78,17 @@ cube_custom_fields:
                         ...
         SomeTool\YyBundle\Entity\Entity2:
             ...
-    access_rights_table: 'XxBundle:AccessEntity'
+    # access_rights_table: 'XxBundle:AccessEntity'
+```
+
+Step X: link custom fields to entities
+--------------------------------------
+Allow to link custom fields to your entity.
+```php
+class Xxx
+{
+    use \CubeTools\CubeCustomFieldsBundle\CustomFieldsEntityHook;
+}
 ```
 
 Step X: show fields in the forms
@@ -100,7 +110,7 @@ class XxxType extends FormType
 class XzyController extends Contoller
 {
     ...
-    public function zxyAction(CubeTools\CubeCustomFieldsBundle\CustomFieldsService $customFieldsService)
+    public function zxyAction(CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService $customFieldsService)
     {
         // or $customFieldsService = $this->get('cube_custom_fields.form_fields');
         $form = $this->createForm(XxxType::class, null, array('customFieldsService' => $customFieldsService;
@@ -108,6 +118,18 @@ class XzyController extends Contoller
     }
 ```
 
-Step X: display the filds
--------------------------
-TODO
+Step X: display the fields
+--------------------------
+
+```twig
+import dynamicFields.macro.twig as dynFld
+
+...
+{{ dynFld.title_column(entities) }}
+...
+{{ dynFld.filter_column(entities) }}
+...
+{% for(entity in entites) %}
+    ...
+    {{ dynFld.value_column(entity) }}
+```
