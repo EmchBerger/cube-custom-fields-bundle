@@ -87,6 +87,28 @@ class CustomFieldsCollection extends AbstractLazyCollection
         parent::set($key, $entity);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * {@inheritdoc}
+     * Special:
+     *     * Throws InvalidArgumentException
+     *
+     * @param CustomFieldBase $entity
+     *
+     * @return {@inheritdoc}
+     *
+     * @throws InvalidArgumentException because appending is not supported
+     */
+    public function add($entity)
+    {
+        if (! $entity->isEmpty() && ! ($key = $entity->getFieldId())) {
+            throw new \InvalidArgumentException('appending not supported');
+        }
+
+        return $this->set($key, $entity);
+    }
+
    /**
      * {@inheritdoc}
      *
@@ -101,6 +123,25 @@ class CustomFieldsCollection extends AbstractLazyCollection
     public function containsKey($key)
     {
         return is_string($key) || parent::containsKey($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        if (! isset($key)) {
+            return $this->add($value);
+        }
+
+        return $this->set($key, $value);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->containsKey($key);
     }
 
     /**
