@@ -7,7 +7,7 @@ services:
     cube_custom_fields.form_fields:
         class: CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService
         arguments:
-            - '%cube_custom_fields.entities'
+            - '%cubetools.customfields.entities%'
     CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
 
     # cube_customfields.service1:

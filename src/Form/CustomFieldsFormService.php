@@ -3,6 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Form;
 
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Forminterface;
 
 class CustomFieldsFormService
 {
@@ -27,14 +28,26 @@ class CustomFieldsFormService
     /**
      * Add all Custom Fields to the form.
      *
-     * @param FormBuilderInterface $form      the form to add the entities to
-     * @param string               $dataClass entity to set the fields for, only when forms data_class is not set.
+     * @param FormBuilderInterface|FormInterface $form      the form to add the entities to
+     * @param string                             $dataClass entity to set the fields for, only when forms data_class is not set.
      *
      * @throws \LogicException when wrong configured
      */
-    public function addCustomFields(FormBuilderInterface $form, $dataClass = null)
+    public function addCustomFields($form, $dataClass = null)
     {
-        $entityClass = $form->getFormConfig()->getOption('data_class');
+        if ($form instanceof Forminterface) {
+            $entityClass = $form->getConfig()->getOption('data_class');
+        } elseif ($form instanceof FormBuilderInterface) {
+            $entityClass = $form->getFormConfig()->getOption('data_class');
+        } else {
+            throw new \InvalidArgumentException(sprintf(
+                '$form must be instance of %s or %s, its class is %s',
+                Forminterface::class,
+                FormBuilderInterface::class,
+                get_class($form)
+            ));
+        }
+
         if (null !== $entityClass && null !== $dataClass && $dataClass !== $entityClass) {
             throw new \LogicException('Do not set $dataClass if forms option data_class is set.');
         } elseif (null !== $dataClass) {
