@@ -61,17 +61,22 @@ imports:
 ```yaml:
 cube_custom_fields:
     entities:
-        'XxBundle:Entity1':
+        XxBundle\Entities\Entity1:
             field_id1:
-                field_type: [text|select|date|entity]
-                field_label: 'label.for.a_field'
+                field_type: SomeFormType
+                     # like Symfony\Component\Form\Extension\Core\Type\[TextType|SelectType|DateTimeType]|Symfony\Bridge\Doctrine\Form\Type\EntityType]
+                label: 'label.for.a_field'
+                form_options:
+                     # any form option
+                     label: label for in form # overwrites label from above
             field_idB:
-                field_type: select
-                field_label: label.select.something
-                choices:
-                    label1: value1
-                    ...
-        'YyBundle:Entity2':
+                type: Symfony\Component\Form\Extension\Core\Type\SelectType
+                label: label.select.something
+                form_options:
+                    choices:
+                        label1: value1
+                        ...
+        SomeTool\YyBundle\Entity\Entity2:
             ...
     access_rights_table: 'XxBundle:AccessEntity'
 ```

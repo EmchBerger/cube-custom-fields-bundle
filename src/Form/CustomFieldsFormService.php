@@ -9,12 +9,6 @@ class CustomFieldsFormService
 {
     private $fieldsConfig = null;
 
-    private $typeMap = array(
-        'text' => TextType::class,
-        'date' => DateType::class,
-        // TODO add more types
-    );
-
     /**
      * Constructor of service.
      *
@@ -64,23 +58,17 @@ class CustomFieldsFormService
         foreach ($fields as $name => $field) {
             $options = array(
                 'property_path' => "customFields[$name].value",
+                'translation_domain' => 'custom_fields',
             );
-            if (isset($field['field_label'])) {
-                $options['label'] = $field['field_label'];
+            if (isset($field['label'])) {
+                $options['label'] = $field['label'];
             }
-            $fieldType = $field['field_type'];
-            if (isset($this->typeMap[$fieldType])) {
-                $type = $this->typeMap[$fieldType];
-            } else {
-                throw new \LogicException(sprintf('type %s is not supported by %s', $fieldType, __CLASS__));
+            $fieldType = $field['type'];
+
+            if (isset($field['field_options'])) {
+                $options = array_merge($options, $field['field_options']);
             }
-            switch ($fieldType) {
-                case 'select':
-                    // TODO $options['choices'] = ...
-                    break;
-                // TODO other special cases
-            }
-            $form->add($name, $type, $options);
+            $form->add($name, $fieldType, $options);
         }
     }
 }
