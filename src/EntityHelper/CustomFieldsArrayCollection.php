@@ -82,6 +82,22 @@ class CustomFieldsArrayCollection extends ArrayCollection
         parent::set($key, $entity);
     }
 
+   /**
+     * {@inheritdoc}
+     *
+     * {@inheritdoc}
+     * Special:
+     *     * returns true when the value could be here.
+     *
+     * @param $key {@inheritdoc}
+     *
+     * @return {@inheritdoc}
+     */
+    public function containsKey($key)
+    {
+        return is_string($key) || parent::containsKey($key);
+    }
+
     /**
      * Creates a real entity from the unsaved one.
      *
