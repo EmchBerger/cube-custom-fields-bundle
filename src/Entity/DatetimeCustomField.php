@@ -23,7 +23,7 @@ class DatetimeCustomField extends CustomFieldBase
      *
      * @return CustomFieldText $this
      */
-    public function setValue(\DateTimeInterface $value)
+    public function setValue(\DateTimeInterface $value = null)
     {
         $this->dateValue = $value;
 
@@ -37,6 +37,10 @@ class DatetimeCustomField extends CustomFieldBase
 
     public function __toString()
     {
-        return $this->dateValue->format('d.m.Y h:i:s'); // TODO really fixed format?
+        if ($this->dateValue) {
+            return $this->dateValue->format('d.m.Y h:i:s'); // TODO really fixed format?
+        } else {
+            return '';
+        }
     }
 }

@@ -57,7 +57,7 @@ class CustomFieldsFormService
 
         foreach ($fields as $name => $field) {
             $options = array(
-                'property_path' => "customFields[$name].value",
+                'by_reference' => false,
                 'translation_domain' => 'custom_fields',
             );
             if (isset($field['label'])) {

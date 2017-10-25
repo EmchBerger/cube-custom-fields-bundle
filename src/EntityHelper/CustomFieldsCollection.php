@@ -145,6 +145,14 @@ class CustomFieldsCollection extends AbstractLazyCollection
     }
 
     /**
+     * Returns the elements in the collection (CustomFieldBase entities) as ArrayCollection
+     */
+    public function toArrayCollection()
+    {
+        return new ArrayCollection($this->collection->toArray());
+    }
+
+    /**
      * Creates a real entity from the unsaved one.
      *
      * @param \CubeTools\CubeCustomFieldsBundle\EntityHelper\UnsavedCustomField $tempEntity

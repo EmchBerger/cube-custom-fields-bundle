@@ -9,9 +9,3 @@ services:
         arguments:
             - '%cubetools.customfields.entities%'
     CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
-
-    # cube_customfields.service1:
-    #     class: CubeTools\CubeCustomFieldsBundle\ClassName
-    #     arguments:
-    #         - '%kernel.root_dir%'
-    # CubeTools\CubeCustomFieldsBundle\ClassName: '@cube_customfields.service1'
