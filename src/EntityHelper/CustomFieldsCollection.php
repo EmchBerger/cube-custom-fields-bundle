@@ -25,6 +25,9 @@ class CustomFieldsCollection extends AbstractLazyCollection
     {
         if (is_array($elements)) {
             $elements = new ArrayCollection($elements);
+        } elseif (! $elements) {
+            // e.g. $elements = null
+            $elements = new ArrayCollection();
         } elseif (! $elements instanceof Collection) {
             throw new \InvalidArgumentException($elements);
         }
