@@ -77,7 +77,27 @@ cube_custom_fields:
                         label1: value1
                         ...
         SomeTool\YyBundle\Entity\Entity2:
-            ...
+            responsibles: # this links as m:n to an existing entity type
+                type: Symfony\Bridge\Doctrine\Form\Type\EntityType
+                label: 'Responsible Persons'
+                field_options:
+                    required: false
+                    multiple: true
+                    class: 'AppBundle:User'
+                    attr:
+                        class: select2
+                        placeholder: Select responsible persons
+            selections: # this links to the custom fields table itself, giving access to all TextCustomField entities with fieldId = predef_1
+                type: Symfony\Bridge\Doctrine\Form\Type\EntityType
+                label: 'Predefined select options'
+                filter: predef_1
+                field_options:
+                    required: false
+                    multiple: false
+                    class: 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField'
+                    attr:
+                        class: select2
+                        placeholder: Select from set of options
     # access_rights_table: 'XxBundle:AccessEntity'
 ```
 
