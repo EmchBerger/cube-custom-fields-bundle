@@ -8,4 +8,9 @@ services:
         class: CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService
         arguments:
             - '%cubetools.customfields.entities%'
+            - '@doctrine.orm.entity_manager'
     CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
+
+    CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField:
+        autowire: true
+        autoconfigure: true

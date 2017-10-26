@@ -15,6 +15,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 abstract class CustomFieldBase
 {
+    protected $config;
+
+    public function __construct()
+    {
+        // TODO: find a better way to retrieve the parameters from custom_fields.yml
+        global $kernel;
+        $this->config = $kernel->getContainer()->getParameter('cubetools.customfields.entities');
+    }
+
     /**
      * @var integer
      *
@@ -93,4 +102,22 @@ abstract class CustomFieldBase
      * @return many
      */
     abstract public function getValue();
+
+    /**
+     * Returns the type according to the configuration
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        // traverse the config and return the type of the first matching element
+        foreach ($this->config as $entity) {
+            foreach ($entity as $fieldId => $conf) {
+                if ($fieldId == $this->getFieldId()) {
+                    return $conf['type'];
+                }
+            }
+        }
+        return null;
+    }
 }

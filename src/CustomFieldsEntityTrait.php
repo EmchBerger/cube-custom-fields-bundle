@@ -111,15 +111,4 @@ trait CustomFieldsEntityTrait
         // save the full list of CustomFieldBase entities as ArrayCollection back to the customFields variable of the main entity
         $this->setCustomFields($customFields->toArrayCollection());
     }
-
-    /**
-     * Persists all customFields to the EntityManager
-     * @param \Doctrine\ORM\EntityManager $em
-     */
-    public function persistCustomFields(\Doctrine\ORM\EntityManager $em)
-    {
-        foreach ($this->customFields as $customField) {
-            $em->persist($customField);
-        }
-    }
 }

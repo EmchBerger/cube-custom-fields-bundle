@@ -2,21 +2,25 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Form;
 
+use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forminterface;
 
 class CustomFieldsFormService
 {
     private $fieldsConfig = null;
+    private $em;
 
     /**
      * Constructor of service.
      *
      * @param array $fieldsConfig Configuration of entities with CustomFields from the bundles configuration.
      */
-    public function __construct(array $fieldsConfig)
+    public function __construct(array $fieldsConfig, EntityManager $em)
     {
         $this->fieldsConfig = $fieldsConfig;
+        $this->em = $em;
     }
 
     /**
@@ -54,7 +58,6 @@ class CustomFieldsFormService
             return; // nothing to do
         }
         $fields = $this->fieldsConfig[$entityClass];
-
         foreach ($fields as $name => $field) {
             $options = array(
                 'by_reference' => false,
@@ -69,6 +72,9 @@ class CustomFieldsFormService
                 $options = array_merge($options, $field['field_options']);
             }
             $form->add($name, $fieldType, $options);
+            if (EntityMapper::isEntityField($field['type'])) {
+                $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em)) ;
+            }
         }
     }
 }

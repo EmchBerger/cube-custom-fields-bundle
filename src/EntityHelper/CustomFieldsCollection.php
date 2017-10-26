@@ -2,13 +2,14 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
-use CubeTools\CubeCustomFieldsBundle\Entity;
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 /**
  * Collection for CustomFieldBase entities.
+ *
+ * To be used as service in order to get the relevant config
  *
  * Creates new (unsaved) entities if required;
  */
@@ -76,8 +77,11 @@ class CustomFieldsCollection extends AbstractLazyCollection
     {
         if ($entity->isEmpty()) {
             // do not save empty entities
+            /*
+             *  TODO: this does not remove CustomFieldBase entities for EntityCustomField collections! 
+             *  Only the link between entity and the collection is removed (which is enough for correct functionality, but leads to dead data in the database)
+             */
             $this->remove($key);
-
             return;
         }
         if ($entity instanceof UnsavedCustomField) {
@@ -167,25 +171,10 @@ class CustomFieldsCollection extends AbstractLazyCollection
     private function createRealEntity(UnsavedCustomField $tempEntity)
     {
         $value = $tempEntity->getValue();
-        $type = gettype($value);
-        /*
-         * TODO Currently the entity type is based on the value type.
-         * Looking up the fieldId in the config would be better. But how to get the config?
-         */
-        switch ($type) {
-            case 'string':
-                $entity = new Entity\TextCustomField();
-                break;
-            case 'object':
-                $type = get_class($value); // for error message
-                if ($value instanceof \DateTimeInterface || $value instanceof \DateTime) {
-                    $entity = new Entity\DatetimeCustomField();
-                    break;
-                }
-                // else go into default
-            default:
-                throw new \InvalidArgumentException('value of $entity has invalid type '.$type);
-        }
+        $formType = $tempEntity->getType();
+        $customFieldType = EntityMapper::getCustomFieldClass($formType);
+
+        $entity = new $customFieldType();
         $entity->setValue($value);
         // do not set $entity->setFieldId($tempEntity->getFieldId), is set later anyway
 
