@@ -21,7 +21,7 @@ class DatetimeCustomField extends CustomFieldBase
      *
      * @param string $value
      *
-     * @return CustomFieldText $this
+     * @return DatetimeCustomField $this
      */
     public function setValue(\DateTimeInterface $value = null)
     {

@@ -21,7 +21,7 @@ class TextCustomField extends CustomFieldBase
      *
      * @param string $value
      *
-     * @return CustomFieldText $this
+     * @return TextCustomField $this
      */
     public function setValue($value)
     {
