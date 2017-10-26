@@ -4,6 +4,7 @@ namespace CubeTools\CubeCustomFieldsBundle\Form;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forminterface;
 
@@ -67,7 +68,11 @@ class CustomFieldsFormService
                 $options['label'] = $field['label'];
             }
             $fieldType = $field['type'];
-
+            if (isset($field['filter'])) {
+                // add repository method for filtering specific fieldIds (only makes sense for EntityType fields used as Selects)
+                $filter = $field['filter'];
+                $field['field_options']['query_builder'] = function (EntityRepository $er) use ($filter) { return $er->createQueryBuilder('customField')->where('customField.fieldId = :filter')->setParameter('filter', $filter); };
+            }
             if (isset($field['field_options'])) {
                 $options = array_merge($options, $field['field_options']);
             }

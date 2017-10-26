@@ -56,7 +56,7 @@ class EntityCustomField extends CustomFieldBase
 
     public function __toString()
     {
-        $entity = $this->getEntity();
+        $entity = $this->getEntityData();
         if ($entity) {
             return $entity->__toString();
         } else {
