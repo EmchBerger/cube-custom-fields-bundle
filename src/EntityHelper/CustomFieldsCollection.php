@@ -173,7 +173,6 @@ class CustomFieldsCollection extends AbstractLazyCollection
         $value = $tempEntity->getValue();
         $formType = $tempEntity->getType();
         $customFieldType = EntityMapper::getCustomFieldClass($formType);
-
         $entity = new $customFieldType();
         $entity->setValue($value);
         // do not set $entity->setFieldId($tempEntity->getFieldId), is set later anyway

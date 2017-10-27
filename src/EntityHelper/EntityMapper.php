@@ -9,6 +9,8 @@ class EntityMapper
 {
     private static $map = array(
         'Symfony\Component\Form\Extension\Core\Type\TextType' => 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField',
+        'Ivory\CKEditorBundle\Form\Type\CKEditorType' => 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField',
+        'Symfony\Component\Form\Extension\Core\Type\TextareaType' => 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField', // we have two mapping for TextareaCustomField. the second (default textarea) is used only in "getCustomFieldClass"
         'Symfony\Component\Form\Extension\Core\Type\DateTimeType' => 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField',
         'Symfony\Bridge\Doctrine\Form\Type\EntityType' => 'CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField',
     );
