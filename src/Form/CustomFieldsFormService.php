@@ -30,10 +30,11 @@ class CustomFieldsFormService
      * @param FormBuilderInterface|FormInterface $form      the form to add the entities to
      * @param string                             $dataClass entity to set the fields for, only when forms data_class is not set.
      * @param array                              $overrideOptions optionally override form configuration options
+     * @param boolean                            $reverseAsString must be set to true in order for ajaxSelect2 field to work properly in filtering mode (refer to cubetools\cube-common-bundle)
      *
      * @throws \LogicException when wrong configured
      */
-    public function addCustomFields($form, $dataClass = null, $overrideOptions = array())
+    public function addCustomFields($form, $dataClass = null, $overrideOptions = array(), $reverseAsString = false)
     {
         if ($form instanceof Forminterface) {
             $entityClass = $form->getConfig()->getOption('data_class');
@@ -93,6 +94,9 @@ class CustomFieldsFormService
             if (!array_key_exists('multiple', $options) && array_key_exists('multiple', $overrideOptions)) {
                 unset($overrideOptions['multiple']);
             }
+            if ($fieldType != 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
+                unset($overrideOptions['allow_clear']);
+            }
             
             $options = array_replace_recursive($options, $overrideOptions);
             if (array_key_exists('multiple', $options));
@@ -100,7 +104,7 @@ class CustomFieldsFormService
             $form->add($name, $fieldType, $options);
             // add model transformer for entity type fields
             if (EntityMapper::isEntityField($field['type'])) {
-                $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em)) ;
+                $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, false)) ;
             }
         }
     }

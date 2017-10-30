@@ -11,8 +11,10 @@ use Doctrine\ORM\EntityManager;
  */
 class EntityCustomFieldTransformer implements DataTransformerInterface
 {
-    public function __construct(EntityManager $em) {
+    public function __construct(EntityManager $em, $fieldType, $reverseAsString = false) {
         $this->em = $em;
+        $this->fieldType = $fieldType;
+        $this->reverseAsString = $reverseAsString;
     }
     /**
      * Transforms a collection of EntityCustomField elements or a single EntityCustomField element into persisted (merged) entities
@@ -42,15 +44,35 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
         }
     }
     /**
-     * Reverse transformation not required. Is here only since defined in the abstract class.
+     * Reverse transformation
      *
      * @param mixed $array An array of entities
      *
-     * @return array
+     * @return mixed contains either the id of the element (as string) or the element itself, depending on the usage scenario
      */
 
     public function reverseTransform($array)
     {
-        return $array; // no transformation required
+        if ($this->reverseAsString && $this->fieldType == 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
+            $idArray = array();
+            if (is_array($array) || $array instanceof \ArrayAccess) {
+                foreach ($array as $elem) {
+                    $idArray[] = (string)$elem->getId();
+                }
+            } else {
+                if ($array) {
+                    return $idArray[] = (string)$array->getId();
+                }
+            }
+
+            if (array_key_exists(0, $idArray)) {
+                return $idArray[0];
+            } else {
+                return '';
+            }
+        } else {
+            // no reverse transformation required
+            return $array;
+        }
     }
 }
