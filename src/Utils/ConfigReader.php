@@ -14,6 +14,15 @@ class ConfigReader
         $this->config = $config;
     }
 
+    public function getConfigForEntity($entityClass)
+    {
+        if (array_key_exists($entityClass, $this->config)) {
+            return $this->config[$entityClass];
+        }
+
+        return array();
+    }
+
     public function getConfigForFieldId($fieldId)
     {
         foreach ($this->config as $entityConfig) {
