@@ -112,12 +112,9 @@ cube_custom_fields:
                 filters: # this can be used to filter for specific fields on the target entity (e.g. only activated users etc.). Note that this is not the same field as for "normal" entity type custom fields (it is "filter" there).
                     enabled: 1
                 field_options:
-                    remote_route: cube_custom_fields_ajax # this value is fixed. It is the internal action used to retrieve the filtered and paginated select options.
                     required: false
                     multiple: false
                     class: 'AppBundle:User' # contains the class of the objects visible to the user (the REAL entities)
-                    remote_params:
-                        fieldId: owner # contains the fieldId (this is redundant with the label of the field currently). Better approach required.
                     minimum_input_length: 0
                     page_limit: 10
                     scroll: true
