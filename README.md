@@ -48,6 +48,14 @@ class AppKernel extends Kernel
 Step 3: Configure the bundle
 ----------------------------
 
+Add the routes in `app/config/routing.yml` of your project.
+
+```yaml
+    ...
+cube_custom_fields:
+    resource: "@CubeCustomFieldsBundle/Resources/config/routing/all.yml"
+```
+
 Then configure the bundle in `app/config/config.yml` of your project.
 
 ```yaml
@@ -90,7 +98,7 @@ cube_custom_fields:
             selections: # this links to the custom fields table itself, giving access to all TextCustomField entities with fieldId = predef_1
                 type: Symfony\Bridge\Doctrine\Form\Type\EntityType
                 label: 'Predefined select options'
-                filter: predef_1
+                filter: predef_1 # this is the name of the referred custom field
                 field_options:
                     required: false
                     multiple: false
@@ -98,6 +106,30 @@ cube_custom_fields:
                     attr:
                         class: select2
                         placeholder: Select from set of options
+            owner: # special case for ajax retrievable select2 boxes (Using Tetranz\Select2EntityBundle)
+                type: Tetranz\Select2EntityBundle\Form\Type\Select2EntityType # contains the class of the form type used
+                label: 'Owned by'
+                filters: # this can be used to filter for specific fields on the target entity (e.g. only activated users etc.). Note that this is not the same field as for "normal" entity type custom fields (it is "filter" there).
+                    enabled: 1
+                field_options:
+                    remote_route: cube_custom_fields_ajax # this value is fixed. It is the internal action used to retrieve the filtered and paginated select options.
+                    required: false
+                    multiple: false
+                    class: 'AppBundle:User' # contains the class of the objects visible to the user (the REAL entities)
+                    remote_params:
+                        fieldId: owner # contains the fieldId (this is redundant with the label of the field currently). Better approach required.
+                    minimum_input_length: 0
+                    page_limit: 10
+                    scroll: true
+                    allow_clear: false
+                    delay: 250
+                    cache: true
+                    cache_timeout: 500
+                    placeholder: Please select
+                    language: de
+                    attr:
+                        style: width:100%
+                        data-role: none
     # access_rights_table: 'XxBundle:AccessEntity'
 ```
 
@@ -127,7 +159,7 @@ class XxxType extends FormType
     ...
 }
 
-class XzyController extends Contoller
+class XzyController extends Controller
 {
     ...
     public function zxyAction(CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService $customFieldsService)

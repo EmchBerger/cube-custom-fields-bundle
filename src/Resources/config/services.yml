@@ -14,3 +14,9 @@ services:
     CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField:
         autowire: true
         autoconfigure: true
+    CubeTools\CubeCustomFieldsBundle\Utils\:
+        autowire: true
+        autoconfigure: true
+        resource: '../../Utils/*'
+        arguments:
+            $config: '%cubetools.customfields.entities%'

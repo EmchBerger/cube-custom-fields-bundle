@@ -12,6 +12,7 @@ class EntityMapper
         'Ivory\CKEditorBundle\Form\Type\CKEditorType' => 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField',
         'Symfony\Component\Form\Extension\Core\Type\TextareaType' => 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField', // we have two mapping for TextareaCustomField. the second (default textarea) is used only in "getCustomFieldClass"
         'Symfony\Component\Form\Extension\Core\Type\DateTimeType' => 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField',
+        'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType' => 'CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField',
         'Symfony\Bridge\Doctrine\Form\Type\EntityType' => 'CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField',
     );
 
@@ -37,7 +38,7 @@ class EntityMapper
 
     public static function isEntityField($formClass)
     {
-        if ($formClass == 'Symfony\Bridge\Doctrine\Form\Type\EntityType') {
+        if ($formClass == 'Symfony\Bridge\Doctrine\Form\Type\EntityType' || $formClass == 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
             return true;
         } else {
             return false;
