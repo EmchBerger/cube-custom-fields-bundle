@@ -2,6 +2,7 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
+use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
 use Doctrine\ORM\EntityManager;
 
 /*
@@ -11,9 +12,9 @@ use Doctrine\ORM\EntityManager;
 
 class CustomFieldRepoService
 {
-    public function __construct($config, EntityManager $em)
+    public function __construct(ConfigReader $configReader, EntityManager $em)
     {
-        $this->config = $config;
+        $this->configReader = $configReader;
         $this->em = $em;
     }
 
@@ -44,12 +45,13 @@ class CustomFieldRepoService
     {
         if (!($fieldId && $object)) {
             // if either of the two parameters is not set, we can skip the rest
+
             return array();
         }
-
-        $objectClass = get_class($object);
-
-        switch ($objectClass) {
+        $config = $this->configReader->getConfigForFieldId($fieldId);
+        $formType = $config['type'];
+        $entityClass = EntityMapper::getCustomFieldClass($formType);
+        switch ($entityClass) {
             case 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField':
                 $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField');
                 break;
@@ -58,7 +60,7 @@ class CustomFieldRepoService
                 $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField');
                 break;
 
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField':
+            case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField';
                 $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField');
                 break;
 
@@ -69,7 +71,6 @@ class CustomFieldRepoService
 
         // retrieve the customField entities from the database
         $customFieldEntities = $er->findBy(array('fieldId' => $fieldId));
-
         // traverse the customField entities and check if the $object is contained
         $containingCustomFields = array();
         foreach ($customFieldEntities as $cfEntity) {
@@ -81,14 +82,15 @@ class CustomFieldRepoService
             if (is_array($cfEntityVal) || $cfEntityVal instanceof \ArrayAccess) {
                 // the customField contains an array of entities
                 foreach ($cfEntityVal as $content) {
-                    if ($content && self::getIdOfObject($object) == self::getIdOfObject($content)) {
+                    // we filter by an object
+                    if ($content && ($object == $content)) {
                         $containingCustomFields[] = $cfEntity;
                         break;
                     }
                 }
             } else {
                 // the customField contains a single entity
-                if (self::getIdOfObject($object) == self::getIdOfObject($cfEntityVal)) {
+                if ($object == $cfEntityVal) {
                     $containingCustomFields[] = $cfEntity;
                 }
             }
@@ -97,6 +99,11 @@ class CustomFieldRepoService
         return $containingCustomFields;
     }
 
+    /**
+     * returns the ID of an object
+     * @param \ArrayAccess $object
+     * @return \ArrayAccess
+     */
     private static function getIdOfObject($object)
     {
         if (is_array($object) || $object instanceof \ArrayAccess) {

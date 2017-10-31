@@ -18,5 +18,8 @@ services:
         autowire: true
         autoconfigure: true
         resource: '../../Utils/*'
+    CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader:
+        autowire: true
+        autoconfigure: true
         arguments:
             $config: '%cubetools.customfields.entities%'
