@@ -57,7 +57,9 @@ class EntityCustomField extends CustomFieldBase
     public function __toString()
     {
         $entity = $this->getEntityData();
-        if ($entity) {
+        if (is_array($entity) || $entity instanceof \ArrayAccess) {
+            return join(', ', $entity);
+        } elseif ($entity) {
             return $entity->__toString();
         } else {
             return '';
