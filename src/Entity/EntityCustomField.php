@@ -99,4 +99,9 @@ class EntityCustomField extends CustomFieldBase
             return null;
         }
     }
+
+    public static function getStorageFieldName()
+    {
+        return 'entityValue';
+    }
 }

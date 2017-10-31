@@ -43,4 +43,9 @@ class DatetimeCustomField extends CustomFieldBase
             return '';
         }
     }
+
+    public static function getStorageFieldName()
+    {
+        return 'dateValue';
+    }
 }

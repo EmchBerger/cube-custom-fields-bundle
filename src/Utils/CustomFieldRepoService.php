@@ -51,17 +51,13 @@ class CustomFieldRepoService
         $config = $this->configReader->getConfigForFieldId($fieldId);
         $formType = $config['type'];
         $entityClass = EntityMapper::getCustomFieldClass($formType);
+        $simpleQuery = false;
         switch ($entityClass) {
             case 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField':
-                $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField');
-                break;
-
             case 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField':
-                $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField');
-                break;
-
+                $simpleQuery = true;
             case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField';
-                $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField');
+                $er = $this->em->getRepository($entityClass);
                 break;
 
             default:
@@ -70,28 +66,39 @@ class CustomFieldRepoService
         }
 
         // retrieve the customField entities from the database
-        $customFieldEntities = $er->findBy(array('fieldId' => $fieldId));
-        // traverse the customField entities and check if the $object is contained
-        $containingCustomFields = array();
-        foreach ($customFieldEntities as $cfEntity) {
-            if ($cfEntity->isEmpty()) {
-                // empty values can occur if the cleanup of empty custom fields is not correctly done
-                continue;
-            }
-            $cfEntityVal = $cfEntity->getValue();
-            if (is_array($cfEntityVal) || $cfEntityVal instanceof \ArrayAccess) {
-                // the customField contains an array of entities
-                foreach ($cfEntityVal as $content) {
-                    // we filter by an object
-                    if ($content && ($object == $content)) {
-                        $containingCustomFields[] = $cfEntity;
-                        break;
-                    }
+        if ($simpleQuery) {
+            $dbField = $entityClass::getStorageFieldName();
+            $containingCustomFields = $er->createQueryBuilder('cf')
+                    ->andWhere('cf.fieldId = :fieldId')
+                    ->andWhere('cf.' . $dbField . ' LIKE :object')
+                    ->setParameters(array(
+                        'fieldId' => $fieldId,
+                        'object' => '%' . $object . '%',
+            ))->getQuery()->getResult();
+        } else {
+            $customFieldEntities = $er->findBy(array('fieldId' => $fieldId));
+            // traverse the customField entities and check if the $object is contained
+            $containingCustomFields = array();
+            foreach ($customFieldEntities as $cfEntity) {
+                if ($cfEntity->isEmpty()) {
+                    // empty values can occur if the cleanup of empty custom fields is not correctly done
+                    continue;
                 }
-            } else {
-                // the customField contains a single entity
-                if ($object == $cfEntityVal) {
-                    $containingCustomFields[] = $cfEntity;
+                $cfEntityVal = $cfEntity->getValue();
+                if (is_array($cfEntityVal) || $cfEntityVal instanceof \ArrayAccess) {
+                    // the customField contains an array of entities
+                    foreach ($cfEntityVal as $content) {
+                        // we filter by an object
+                        if ($content && ($object == $content)) {
+                            $containingCustomFields[] = $cfEntity;
+                            break;
+                        }
+                    }
+                } else {
+                    // the customField contains a single entity
+                    if ($object == $cfEntityVal) {
+                        $containingCustomFields[] = $cfEntity;
+                    }
                 }
             }
         }

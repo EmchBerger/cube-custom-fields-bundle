@@ -120,4 +120,11 @@ abstract class CustomFieldBase
         }
         return null;
     }
+
+    /**
+     * Get name of DB storage field of this custom field.
+     *
+     * @return string
+     */
+    abstract static public function getStorageFieldName();
 }
