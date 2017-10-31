@@ -104,7 +104,7 @@ class CustomFieldsFormService
             $form->add($name, $fieldType, $options);
             // add model transformer for entity type fields
             if (EntityMapper::isEntityField($field['type'])) {
-                $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, false)) ;
+                $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, $reverseAsString)) ;
             }
         }
     }
