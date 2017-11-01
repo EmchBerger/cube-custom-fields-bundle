@@ -19,6 +19,23 @@ class CustomFieldRepoService
     }
 
     /**
+     * Retrieves all entities from a given class which are linked to a specific CustomField
+     * @param string $entityClass Must be an entity stored in the database
+     * @param integer $customFieldId  The ID of the customField base entity to match with
+     * @return array        Contains all found customField entities, which point to $object
+     */
+    public function getEntitiesIdsForCustomFieldId($entityClass, $customFieldId)
+    {
+        $qb = $this->em->getRepository($entityClass)->createQueryBuilder('e'); //->findBy(array('customFields', $customField));
+        $qb->join('e.customFields', 'cf')
+           ->select('e.id')
+           ->where('cf.id = :id')
+           ->setParameter('id', $customFieldId);
+        $result = $qb->getQuery()->getScalarResult();
+        return array_column($result, 'id');
+    }
+
+    /**
      * Retrieves all customField entities IDs (with fieldId = $fieldId) which point to $object
      * @param type $fieldId The identifier of the customField to search through
      * @param type $object  Must be an entity stored in the database

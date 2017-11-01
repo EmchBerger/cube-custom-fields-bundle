@@ -40,13 +40,16 @@ class AjaxFieldController extends Controller
         }
 
         $class = $fieldConfig['field_options']['class']; // read from the configuration: parameter containing the class of the entities to be looked up
-
+        $dbStorage = $class::getStorageFieldName();
         $qb = $em->createQueryBuilder()
             ->select('cf')
             ->from($class, 'cf');
         foreach ($filters as $field => $value) {
             $qb->andWhere(sprintf('cf.%s = :%s', $field, $field))
-               ->setParameter($field, $value);
+                ->setParameter($field, $value)
+                // here we should add a switch based on the dbStorage field type
+                ->andWhere('cf.' . $dbStorage . ' LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
         }
         
         $allRelevantEntities = $qb->getQuery()->getResult();
