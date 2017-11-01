@@ -62,6 +62,7 @@ class CustomFieldsFormService
         }
         $fields = $this->fieldsConfig[$entityClass];
         foreach ($fields as $name => $field) {
+            $fieldOverrideOptions = $overrideOptions;
             $options = array(
                 'by_reference' => false,
                 'translation_domain' => 'custom_fields',
@@ -81,6 +82,7 @@ class CustomFieldsFormService
                     return $qb;
                 };
             }
+            // define the options
             if ($fieldType == 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
                 // automatically set route and remote parameters
                 $field['field_options']['remote_route'] = 'cube_custom_fields_ajax';
@@ -89,19 +91,20 @@ class CustomFieldsFormService
             if (isset($field['field_options'])) {
                 $options = array_merge($options, $field['field_options']);
             }
-            // apply options override
-            // TODO: find better solution here! --> remove multiple-option if not set currently
-            if (!array_key_exists('multiple', $options) && array_key_exists('multiple', $overrideOptions)) {
-                unset($overrideOptions['multiple']);
-            }
-            if ($fieldType != 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
-                unset($overrideOptions['allow_clear']);
-            }
-            
-            $options = array_replace_recursive($options, $overrideOptions);
-            if (array_key_exists('multiple', $options));
-            // add field to form
+            // create draft of form field without override options
             $form->add($name, $fieldType, $options);
+            // apply options override
+            if (count($fieldOverrideOptions)) {
+                if (!$form->get($name)->hasOption('multiple')) {
+                    unset($fieldOverrideOptions['multiple']);
+                }
+                if ($fieldType !== 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
+                    unset($fieldOverrideOptions['allow_clear']);
+                }
+                $options = array_replace_recursive($options, $fieldOverrideOptions);
+                // add field to form again, now with overriden options (the existing form field will be overriden)
+                $form->add($name, $fieldType, $options);
+            }
             // add model transformer for entity type fields
             if (EntityMapper::isEntityField($field['type'])) {
                 $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, $reverseAsString)) ;

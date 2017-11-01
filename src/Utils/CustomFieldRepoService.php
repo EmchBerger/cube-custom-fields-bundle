@@ -106,14 +106,14 @@ class CustomFieldRepoService
                     // the customField contains an array of entities
                     foreach ($cfEntityVal as $content) {
                         // we filter by an object
-                        if ($content && ($object == $content)) {
+                        if ($content && self::compareObjects($content, $object)) {
                             $containingCustomFields[] = $cfEntity;
                             break;
                         }
                     }
                 } else {
                     // the customField contains a single entity
-                    if ($object == $cfEntityVal) {
+                    if (self::compareObjects($object, $cfEntityVal)) {
                         $containingCustomFields[] = $cfEntity;
                     }
                 }
@@ -121,6 +121,15 @@ class CustomFieldRepoService
         }
 
         return $containingCustomFields;
+    }
+
+    private function compareObjects($a, $b)
+    {
+        if (is_object($a) && method_exists($a, 'getId') && is_object($b) && method_exists($b, 'getId')) {
+            return $a->getId() == $b->getId();
+        } else {
+            return $a == $b;
+        }
     }
 
     /**
