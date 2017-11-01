@@ -131,22 +131,4 @@ class CustomFieldRepoService
             return $a == $b;
         }
     }
-
-    /**
-     * returns the ID of an object
-     * @param \ArrayAccess $object
-     * @return \ArrayAccess
-     */
-    private static function getIdOfObject($object)
-    {
-        if (is_array($object) || $object instanceof \ArrayAccess) {
-            if (array_key_exists('id', $object)) {
-                return $object['id'];
-            }
-        }
-        if (method_exists($object, 'getId')) {
-            return $object->getId();
-        }
-        return null;
-    }
 }

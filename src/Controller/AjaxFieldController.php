@@ -61,7 +61,8 @@ class AjaxFieldController extends Controller
                     ->setParameter($field, $value)
                     // here we should add a switch based on the dbStorage field type
                     ->andWhere('cf.' . $dbStorage . ' LIKE :term')
-                    ->setParameter('term', '%' . $term . '%');
+                    ->setParameter('term', '%' . $term . '%')
+                    ->orderBy('cf.' . $dbStorage, 'asc');
             }
             $allRelevantEntities = $qb->getQuery()->getResult();
         } else {
