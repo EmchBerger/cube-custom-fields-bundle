@@ -40,19 +40,49 @@ class AjaxFieldController extends Controller
         }
 
         $class = $fieldConfig['field_options']['class']; // read from the configuration: parameter containing the class of the entities to be looked up
-        $dbStorage = $class::getStorageFieldName();
-        $qb = $em->createQueryBuilder()
-            ->select('cf')
-            ->from($class, 'cf');
-        foreach ($filters as $field => $value) {
-            $qb->andWhere(sprintf('cf.%s = :%s', $field, $field))
-                ->setParameter($field, $value)
-                // here we should add a switch based on the dbStorage field type
-                ->andWhere('cf.' . $dbStorage . ' LIKE :term')
-                ->setParameter('term', '%' . $term . '%');
+
+        if (is_subclass_of($class, \CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase::class)) {
+            // we are querying an internal field
+            $dbStorage = $class::getStorageFieldName();
+        } else {
+            if (isset($fieldConfig['field_options']['text_property'])) {
+                $dbStorage = $fieldConfig['field_options']['text_property'];
+            } else {
+                $dbStorage = null;
+            }
         }
-        
-        $allRelevantEntities = $qb->getQuery()->getResult();
+        if ($dbStorage) {
+            // we can create a query
+            $qb = $em->createQueryBuilder()
+                ->select('cf')
+                ->from($class, 'cf');
+            foreach ($filters as $field => $value) {
+                $qb->andWhere(sprintf('cf.%s = :%s', $field, $field))
+                    ->setParameter($field, $value)
+                    // here we should add a switch based on the dbStorage field type
+                    ->andWhere('cf.' . $dbStorage . ' LIKE :term')
+                    ->setParameter('term', '%' . $term . '%');
+            }
+            $allRelevantEntities = $qb->getQuery()->getResult();
+        } else {
+            // we cannot create a query, but will compare the __toString value of all available entities
+            $allFoundEntities = $em->getRepository($class)->findBy($filters); // we filter by the specific filters defined in the config for this field
+            if ($term) {
+                // we must limit the result set to the matching ones for the search $term
+                $allRelevantEntities = array();
+                $oldLocale = setlocale(LC_CTYPE, null);
+                setlocale(LC_CTYPE, array('en_GB', 'en_GB.utf-8'));
+                foreach ($allFoundEntities as $foundEntity) {
+                    if (false !== stristr(iconv('UTF-8', 'ASCII//TRANSLIT', $foundEntity->__toString()), iconv('UTF-8', 'ASCII//TRANSLIT', $term))) {
+                        $allRelevantEntities[] = $foundEntity;
+                    }
+                }
+                setlocale(LC_CTYPE, $oldLocale);
+            } else {
+                // no $term specified, all found are relevant
+                $allRelevantEntities = $allFoundEntities;
+            }
+        }
         $returnArray = array();
         $returnArray['totalCount'] = count($allRelevantEntities);
 
