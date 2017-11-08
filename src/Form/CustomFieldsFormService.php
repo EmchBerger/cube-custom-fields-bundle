@@ -3,7 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Form;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forminterface;
@@ -18,7 +18,7 @@ class CustomFieldsFormService
      *
      * @param array $fieldsConfig Configuration of entities with CustomFields from the bundles configuration.
      */
-    public function __construct(array $fieldsConfig, EntityManager $em)
+    public function __construct(array $fieldsConfig, EntityManagerInterface $em)
     {
         $this->fieldsConfig = $fieldsConfig;
         $this->em = $em;
