@@ -2,15 +2,15 @@
 
 namespace Tests\CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
-use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsArrayCollection;
+use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 
-class CustomFieldsArrayCollectionTest extends TestCase
+class CustomFieldsCollectionTest extends TestCase
 {
     public function testGetSet()
     {
-        $cfac = new CustomFieldsArrayCollection();
+        $cfac = new CustomFieldsCollection();
         $this->assertCount(0, $cfac);
 
         $newEl = $cfac['notYetExisting'];
@@ -44,16 +44,16 @@ class CustomFieldsArrayCollectionTest extends TestCase
 
     public function testCreate()
     {
-        $forTestData = new CustomFieldsArrayCollection();
+        $forTestData = new CustomFieldsCollection();
         $testData = array();
         $testData['x'] = $forTestData['x'];
         $testData['f'] = $forTestData['f'];
 
-        $fromCol = new CustomFieldsArrayCollection(new ArrayCollection($testData));
+        $fromCol = new CustomFieldsCollection(new ArrayCollection($testData));
         $this->assertCount(2, $fromCol, 'from ArrayCollection');
 
         $testData['a'] = $forTestData['a']->setValue('123');
-        $fromArr = new CustomFieldsArrayCollection($testData);
+        $fromArr = new CustomFieldsCollection($testData);
         $this->assertCount(3, $fromArr, 'from array');
     }
 }
