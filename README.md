@@ -48,32 +48,96 @@ class AppKernel extends Kernel
 Step 3: Configure the bundle
 ----------------------------
 
+Add the routes in `app/config/routing.yml` of your project.
+
+```yaml
+    ...
+cube_custom_fields:
+    resource: "@CubeCustomFieldsBundle/Resources/config/routing/all.yml"
+```
+
 Then configure the bundle in `app/config/config.yml` of your project.
 
 ```yaml
 imports:
     ...
-    { require: custom_fields.yml }
-    # or to ignore when not existing or invalid { require: custom_fields, ignore_errors: true }
+    { resource: custom_fields.yml }
+    # or to ignore when not existing or invalid { resource: custom_fields.yml, ignore_errors: true }
 ```
 
 `app/config/custom_fields.yml`
 ```yaml:
 cube_custom_fields:
     entities:
-        'XxBundle:Entity1':
+        XxBundle\Entities\Entity1:
             field_id1:
-                field_type: [text|select|date|entity]
-                field_label: 'label.for.a_field'
+                field_type: SomeFormType
+                     # like Symfony\Component\Form\Extension\Core\Type\[TextType|SelectType|DateTimeType]|Symfony\Bridge\Doctrine\Form\Type\EntityType]
+                label: 'label.for.a_field'
+                form_options:
+                     # any form option
+                     label: label for in form # overwrites label from above
             field_idB:
-                field_type: select
-                field_label: label.select.something
-                choices:
-                    label1: value1
-                    ...
-        'YyBundle:Entity2':
-            ...
-    access_rights_table: 'XxBundle:AccessEntity'
+                type: Symfony\Component\Form\Extension\Core\Type\SelectType
+                label: label.select.something
+                form_options:
+                    choices:
+                        label1: value1
+                        ...
+        SomeTool\YyBundle\Entity\Entity2:
+            responsibles: # this links as m:n to an existing entity type
+                type: Symfony\Bridge\Doctrine\Form\Type\EntityType
+                label: 'Responsible Persons'
+                field_options:
+                    required: false
+                    multiple: true
+                    class: 'AppBundle:User'
+                    attr:
+                        class: select2
+                        placeholder: Select responsible persons
+            selections: # this links to the custom fields table itself, giving access to all TextCustomField entities with fieldId = predef_1
+                type: Symfony\Bridge\Doctrine\Form\Type\EntityType
+                label: 'Predefined select options'
+                filter: predef_1 # this is the name of the referred custom field
+                field_options:
+                    required: false
+                    multiple: false
+                    class: 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField'
+                    attr:
+                        class: select2
+                        placeholder: Select from set of options
+            owner: # special case for ajax retrievable select2 boxes (Using Tetranz\Select2EntityBundle)
+                type: Tetranz\Select2EntityBundle\Form\Type\Select2EntityType # contains the class of the form type used
+                label: 'Owned by'
+                filters: # this can be used to filter for specific fields on the target entity (e.g. only activated users etc.). Note that this is not the same field as for "normal" entity type custom fields (it is "filter" there).
+                    enabled: 1
+                field_options:
+                    required: false
+                    multiple: false
+                    class: 'AppBundle:User' # contains the class of the objects visible to the user (the REAL entities)
+                    minimum_input_length: 0
+                    page_limit: 10
+                    scroll: true
+                    allow_clear: false
+                    delay: 250
+                    cache: true
+                    cache_timeout: 500
+                    placeholder: Please select
+                    language: de
+                    attr:
+                        style: width:100%
+                        data-role: none
+    # access_rights_table: 'XxBundle:AccessEntity'
+```
+
+Step X: link custom fields to entities
+--------------------------------------
+Allow to link custom fields to your entity.
+```php
+class Xxx
+{
+    use \CubeTools\CubeCustomFieldsBundle\CustomFieldsEntityHook;
+}
 ```
 
 Step X: show fields in the forms
@@ -92,10 +156,10 @@ class XxxType extends FormType
     ...
 }
 
-class XzyController extends Contoller
+class XzyController extends Controller
 {
     ...
-    public function zxyAction(CubeTools\CubeCustomFieldsBundle\CustomFieldsService $customFieldsService)
+    public function zxyAction(CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService $customFieldsService)
     {
         // or $customFieldsService = $this->get('cube_custom_fields.form_fields');
         $form = $this->createForm(XxxType::class, null, array('customFieldsService' => $customFieldsService;
@@ -103,6 +167,18 @@ class XzyController extends Contoller
     }
 ```
 
-Step X: display the filds
--------------------------
-TODO
+Step X: display the fields
+--------------------------
+
+```twig
+import dynamicFields.macro.twig as dynFld
+
+...
+{{ dynFld.title_column(entities) }}
+...
+{{ dynFld.filter_column(entities) }}
+...
+{% for(entity in entites) %}
+    ...
+    {{ dynFld.value_column(entity) }}
+```

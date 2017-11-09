@@ -7,11 +7,22 @@ services:
     cube_custom_fields.form_fields:
         class: CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService
         arguments:
-            - '%cube_custom_fields.entities'
+            - '%cubetools.customfields.entities%'
+            - '@doctrine.orm.entity_manager'
     CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
-
-    # cube_customfields.service1:
-    #     class: CubeTools\CubeCustomFieldsBundle\ClassName
-    #     arguments:
-    #         - '%kernel.root_dir%'
-    # CubeTools\CubeCustomFieldsBundle\ClassName: '@cube_customfields.service1'
+    CubeTools\CubeCustomFieldsBundle\Filter\:
+        autowire: true
+        autoconfigure: true
+        resource: '../../Filter/*'
+    CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField:
+        autowire: true
+        autoconfigure: true
+    CubeTools\CubeCustomFieldsBundle\Utils\:
+        autowire: true
+        autoconfigure: true
+        resource: '../../Utils/*'
+    CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $config: '%cubetools.customfields.entities%'

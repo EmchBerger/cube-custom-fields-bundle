@@ -28,4 +28,9 @@ class UnsavedCustomField extends CustomFieldBase
 
         return $this;
     }
+
+    public static function getStorageFieldName()
+    {
+        return 'tempValue';
+    }
 }

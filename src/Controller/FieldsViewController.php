@@ -4,7 +4,7 @@ namespace CubeTools\CubeCustomFieldsBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class FieldsViewContoller extends Contoller
+class FieldsViewController extends Controller
 {
     public function valuesAction($entity)
     {

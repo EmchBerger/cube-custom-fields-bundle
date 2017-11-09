@@ -7,36 +7,36 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  */
-class TextCustomField extends CustomFieldBase
+class TextareaCustomField extends CustomFieldBase
 {
     /**
      * @var string
      *
      * @ORM\Column(type="text")
      */
-    private $strValue;
+    private $textValue;
 
     /**
      * Set the value.
      *
      * @param string $value
      *
-     * @return TextCustomField $this
+     * @return TextareaCustomField $this
      */
     public function setValue($value)
     {
-        $this->strValue = $value;
+        $this->textValue = $value;
 
         return $this;
     }
 
     public function getValue()
     {
-        return $this->strValue;
+        return $this->textValue;
     }
 
     public static function getStorageFieldName()
     {
-        return 'strValue';
+        return 'textValue';
     }
 }

@@ -1,0 +1,3 @@
+cube_custom_fields:
+    resource: "@CubeCustomFieldsBundle/Controller/"
+    type:     annotation
