@@ -2,11 +2,9 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
-
-/* 
+/**
  * This service class allows access to the bundle configuration (custom_fields.yml)
  */
-
 class ConfigReader
 {
     public function __construct($config)
@@ -30,6 +28,7 @@ class ConfigReader
                 return $entityConfig[$fieldId];
             }
         }
+
         return array();
     }
 }

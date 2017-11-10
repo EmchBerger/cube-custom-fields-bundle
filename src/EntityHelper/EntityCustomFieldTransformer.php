@@ -16,6 +16,7 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
         $this->fieldType = $fieldType;
         $this->reverseAsString = $reverseAsString;
     }
+
     /**
      * Transforms a collection of EntityCustomField elements or a single EntityCustomField element into persisted (merged) entities
      *
@@ -28,7 +29,7 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
         if (null === $collection) {
             return array();
         }
-        if (is_array($collection) || $collection instanceof \ArrayAccess ) {
+        if (is_array($collection) || $collection instanceof \ArrayAccess) {
             // multiple entities
             // persist entities if required
             $mergedArray = array();
@@ -37,12 +38,14 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
                     $mergedArray[] = $this->em->merge($entity);
                 }
             }
+
             return $mergedArray;
         } else {
             // single entity (the collection is an entity)
             return $this->em->merge($collection);
         }
     }
+
     /**
      * Reverse transformation
      *
@@ -50,18 +53,17 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
      *
      * @return mixed contains either the id of the element (as string) or the element itself, depending on the usage scenario
      */
-
     public function reverseTransform($array)
     {
         if ($this->reverseAsString && $this->fieldType == 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
             $idArray = array();
             if (is_array($array) || $array instanceof \ArrayAccess) {
                 foreach ($array as $elem) {
-                    $idArray[] = (string)$elem->getId();
+                    $idArray[] = (string) $elem->getId();
                 }
             } else {
                 if ($array) {
-                    return $idArray[] = (string)$array->getId();
+                    return $idArray[] = (string) $array->getId();
                 }
             }
 

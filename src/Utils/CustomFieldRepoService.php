@@ -5,11 +5,10 @@ namespace CubeTools\CubeCustomFieldsBundle\Utils;
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
 use Doctrine\ORM\EntityManager;
 
-/*
+/**
  * This service allows to get IDs of customField entities (base entities)
  * by querying.
  */
-
 class CustomFieldRepoService
 {
     public function __construct(ConfigReader $configReader, EntityManager $em)
@@ -32,6 +31,7 @@ class CustomFieldRepoService
            ->where('cf.id = :id')
            ->setParameter('id', $customFieldId);
         $result = $qb->getQuery()->getScalarResult();
+
         return array_column($result, 'id');
     }
 
