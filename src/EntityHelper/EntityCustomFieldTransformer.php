@@ -11,6 +11,10 @@ use Doctrine\ORM\EntityManager;
  */
 class EntityCustomFieldTransformer implements DataTransformerInterface
 {
+    private $em;
+    private $fieldType;
+    private $reverseAsSting;
+
     public function __construct(EntityManager $em, $fieldType, $reverseAsString = false)
     {
         $this->em = $em;

@@ -7,6 +7,8 @@ namespace CubeTools\CubeCustomFieldsBundle\Utils;
  */
 class ConfigReader
 {
+    private $config;
+
     public function __construct($config)
     {
         $this->config = $config;

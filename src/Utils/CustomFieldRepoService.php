@@ -11,6 +11,9 @@ use Doctrine\ORM\EntityManager;
  */
 class CustomFieldRepoService
 {
+    private $configReader;
+    private $em;
+
     public function __construct(ConfigReader $configReader, EntityManager $em)
     {
         $this->configReader = $configReader;
