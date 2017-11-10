@@ -43,8 +43,8 @@ class CustomFieldRepoService
     /**
      * Retrieves all customField entities IDs (with fieldId = $fieldId) which point to $object
      *
-     * @param type $fieldId The identifier of the customField to search through
-     * @param type $object  Must be an entity stored in the database
+     * @param int    $fieldId The identifier of the customField to search through
+     * @param object $object  Must be an entity stored in the database
      *
      * @return array        Contains all found customField entities IDs, which point to $object
      */
@@ -62,8 +62,8 @@ class CustomFieldRepoService
     /**
      * Retrieves all customField entities (with fieldId = $fieldId) which point to $object
      *
-     * @param type $fieldId The identifier of the customField to search through
-     * @param type $object  Must be an entity stored in the database
+     * @param int    $fieldId The identifier of the customField to search through
+     * @param object $object  Must be an entity stored in the database
      *
      * @return array        Contains all found customField entities, which point to $object
      */

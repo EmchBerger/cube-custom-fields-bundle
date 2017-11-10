@@ -78,9 +78,9 @@ class EntityCustomField extends CustomFieldBase
     }
 
     /**
-     * @global type $kernel
+     * @global \Symfony\Component\HttpKernel\KernelInterface $kernel
      *
-     * @return type either returns an entity or an array collection of entities
+     * @return object|ArrayCollection either returns an entity or an array collection of entities
      */
     private function getEntityData()
     {
