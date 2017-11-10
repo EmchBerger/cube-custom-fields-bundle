@@ -174,11 +174,10 @@ abstract class CustomFieldBase
     public function getType()
     {
         // traverse the config and return the type of the first matching element
+        $fieldId = $this->getFieldId();
         foreach ($this->config as $entity) {
-            foreach ($entity as $fieldId => $conf) {
-                if ($fieldId == $this->getFieldId()) {
-                    return $conf['type'];
-                }
+            if (isset($entity[$fieldId])) {
+                return $entity[$fieldId]['type'];
             }
         }
 
