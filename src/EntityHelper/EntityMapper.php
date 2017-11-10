@@ -27,7 +27,7 @@ class EntityMapper
 
     public static function getFormClass($customFieldClass)
     {
-        foreach (self::$map as $key=>$elem) {
+        foreach (self::$map as $key => $elem) {
             if ($elem == $customFieldClass) {
                 return $key;
             }

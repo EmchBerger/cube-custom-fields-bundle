@@ -22,7 +22,7 @@ class CustomFieldsFilterService
         if (!$firstRootAlias) {
             $firstRootAlias = $qb->getRootAliases()[0];
         }
-        $qb->leftJoin($firstRootAlias . '.customFields', 'cf');
+        $qb->leftJoin($firstRootAlias.'.customFields', 'cf');
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
                 $filterName = $filterfield->getName();
@@ -47,9 +47,9 @@ class CustomFieldsFilterService
                     $inArrClause = array();
                     foreach ($cfArr as $cf) {
                         $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId('AppBundle:Reservation', $cf);
-                        $inArrClause[] = $firstRootAlias . '.id IN (' . join(',', $relevantEntitiesIds) . ')';
+                        $inArrClause[] = $firstRootAlias.'.id IN ('.implode(',', $relevantEntitiesIds).')';
                     }
-                    $qb->andWhere(join(' OR ', $inArrClause));
+                    $qb->andWhere(implode(' OR ', $inArrClause));
                 } else {
                     // no custom field contains the requested value. Therefore, no entry can satisfy the filter criteria and we can directly skip all further fields.
                     $qb->andWhere("TRUE = FALSE");

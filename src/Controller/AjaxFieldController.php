@@ -60,9 +60,9 @@ class AjaxFieldController extends Controller
                 $qb->andWhere(sprintf('cf.%s = :%s', $field, $field))
                     ->setParameter($field, $value)
                     // here we should add a switch based on the dbStorage field type
-                    ->andWhere('cf.' . $dbStorage . ' LIKE :term')
-                    ->setParameter('term', '%' . $term . '%')
-                    ->orderBy('cf.' . $dbStorage, 'asc');
+                    ->andWhere('cf.'.$dbStorage.' LIKE :term')
+                    ->setParameter('term', '%'.$term.'%')
+                    ->orderBy('cf.'.$dbStorage, 'asc');
             }
             $allRelevantEntities = $qb->getQuery()->getResult();
         } else {
@@ -89,12 +89,12 @@ class AjaxFieldController extends Controller
 
         // limit to the number of tags
         $returnArray['entities'] = array();
-        for ($i = ($limit*$page-$limit); $i<min(($limit*$page), $returnArray['totalCount']); $i++) {
+        for ($i = ($limit * $page - $limit); $i < min(($limit * $page), $returnArray['totalCount']); ++$i) {
             $returnArray['entities'][] = $allRelevantEntities[$i];
         }
 
         $more = false;
-        if ($limit*$page < $returnArray['totalCount']) {
+        if ($limit * $page < $returnArray['totalCount']) {
             $more = true;
         }
 
@@ -102,13 +102,13 @@ class AjaxFieldController extends Controller
         foreach ($returnArray['entities'] as $entity) {
             $entities[] = array(
                 'id' => $entity->getId(),
-                'text' => (string)$entity,
+                'text' => (string) $entity,
             );
         }
 
         return new JsonResponse(array(
-        'results' => $entities,
-        'more' => $more,
+            'results' => $entities,
+            'more' => $more,
         ));
     }
 }

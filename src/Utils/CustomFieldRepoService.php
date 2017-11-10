@@ -19,8 +19,10 @@ class CustomFieldRepoService
 
     /**
      * Retrieves all entities from a given class which are linked to a specific CustomField
-     * @param string $entityClass Must be an entity stored in the database
-     * @param integer $customFieldId  The ID of the customField base entity to match with
+     *
+     * @param string $entityClass   Must be an entity stored in the database
+     * @param int    $customFieldId The ID of the customField base entity to match with
+     *
      * @return array        Contains all found customField entities, which point to $object
      */
     public function getEntitiesIdsForCustomFieldId($entityClass, $customFieldId)
@@ -37,8 +39,10 @@ class CustomFieldRepoService
 
     /**
      * Retrieves all customField entities IDs (with fieldId = $fieldId) which point to $object
+     *
      * @param type $fieldId The identifier of the customField to search through
      * @param type $object  Must be an entity stored in the database
+     *
      * @return array        Contains all found customField entities IDs, which point to $object
      */
     public function getCustomFieldEntitiesIdsForObject($fieldId, $object)
@@ -54,8 +58,10 @@ class CustomFieldRepoService
 
     /**
      * Retrieves all customField entities (with fieldId = $fieldId) which point to $object
+     *
      * @param type $fieldId The identifier of the customField to search through
      * @param type $object  Must be an entity stored in the database
+     *
      * @return array        Contains all found customField entities, which point to $object
      */
     public function getCustomFieldEntitiesForObject($fieldId, $object)
@@ -73,7 +79,8 @@ class CustomFieldRepoService
             case 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField':
             case 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField':
                 $simpleQuery = true;
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField';
+                // no break, set $er below
+            case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField':
                 $er = $this->em->getRepository($entityClass);
                 break;
 
@@ -87,11 +94,12 @@ class CustomFieldRepoService
             $dbField = $entityClass::getStorageFieldName();
             $containingCustomFields = $er->createQueryBuilder('cf')
                     ->andWhere('cf.fieldId = :fieldId')
-                    ->andWhere('cf.' . $dbField . ' LIKE :object')
+                    ->andWhere('cf.'.$dbField.' LIKE :object')
                     ->setParameters(array(
                         'fieldId' => $fieldId,
-                        'object' => '%' . $object . '%',
-            ))->getQuery()->getResult();
+                        'object' => '%'.$object.'%',
+                    ))->getQuery()->getResult()
+            ;
         } else {
             $customFieldEntities = $er->findBy(array('fieldId' => $fieldId));
             // traverse the customField entities and check if the $object is contained

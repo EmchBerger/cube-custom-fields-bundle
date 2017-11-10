@@ -19,7 +19,7 @@ class EntityCustomField extends CustomFieldBase
     /**
      * Set the value.
      *
-     * @param entity or array collection of entities
+     * @param any $value entity or array collection of entities
      *
      * @return EntityCustomField $this
      */
@@ -46,6 +46,7 @@ class EntityCustomField extends CustomFieldBase
         } else {
             $this->entityValue = null;
         }
+
         return $this;
     }
 
@@ -58,7 +59,7 @@ class EntityCustomField extends CustomFieldBase
     {
         $entity = $this->getEntityData();
         if (is_array($entity) || $entity instanceof \ArrayAccess) {
-            return join(', ', $entity);
+            return implode(', ', $entity);
         } elseif ($entity) {
             return $entity->__toString();
         } else {
@@ -77,8 +78,8 @@ class EntityCustomField extends CustomFieldBase
     }
 
     /**
-     * 
      * @global type $kernel
+     *
      * @return type either returns an entity or an array collection of entities
      */
     private function getEntityData()
@@ -94,6 +95,7 @@ class EntityCustomField extends CustomFieldBase
                 // single
                 $entityData = $em->getRepository($this->entityValue['entityClass'])->findOneById($this->entityValue['entityId']);
             }
+
             return $entityData;
         } else {
             return null;

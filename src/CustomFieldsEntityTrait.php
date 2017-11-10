@@ -15,11 +15,11 @@ trait CustomFieldsEntityTrait
     /**
      * Custom fields linked to this entity.
      *
-     * @var ArrayCollection(BaseCustomField)
+     * @var ArrayCollection of CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase
      *
      * @ORM\ManyToMany(targetEntity="CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase", indexBy="fieldId", cascade="all", orphanRemoval=true)
      * @ORM\JoinTable(inverseJoinColumns={@ORM\JoinColumn(unique=true)})
-     * @var CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase[]
+     *
      * ManyToMany+JoinTable with unique (= OneToMany) because the owning side can not be on the CustomFields table.
      * It is not inversed, since it would not work.
      */
@@ -85,8 +85,9 @@ trait CustomFieldsEntityTrait
     /**
      * Gets a single field from the customFields ArrayCollection
      *
-     * @param type $name
-     * @return type
+     * @param string $name
+     *
+     * @return any
      */
     public function __get($name)
     {
@@ -96,7 +97,8 @@ trait CustomFieldsEntityTrait
     /**
      * Sets a single field to the customFields ArrayCollection
      *
-     * @param type $value
+     * @param string $name
+     * @param any    $value
      */
     public function __set($name, $value)
     {
