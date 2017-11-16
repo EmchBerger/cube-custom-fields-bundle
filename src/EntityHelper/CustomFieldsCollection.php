@@ -26,10 +26,10 @@ class CustomFieldsCollection extends AbstractLazyCollection
     {
         if (is_array($elements)) {
             $elements = new ArrayCollection($elements);
-        } elseif (! $elements) {
+        } elseif (!$elements) {
             // e.g. $elements = null
             $elements = new ArrayCollection();
-        } elseif (! $elements instanceof Collection) {
+        } elseif (!$elements instanceof Collection) {
             throw new \InvalidArgumentException($elements);
         }
 
@@ -78,10 +78,11 @@ class CustomFieldsCollection extends AbstractLazyCollection
         if ($entity->isEmpty()) {
             // do not save empty entities
             /*
-             *  TODO: this does not remove CustomFieldBase entities for EntityCustomField collections! 
+             *  TODO: this does not remove CustomFieldBase entities for EntityCustomField collections!
              *  Only the link between entity and the collection is removed (which is enough for correct functionality, but leads to dead data in the database)
              */
             $this->remove($key);
+
             return;
         }
         if ($entity instanceof UnsavedCustomField) {
@@ -109,7 +110,7 @@ class CustomFieldsCollection extends AbstractLazyCollection
      */
     public function add($entity)
     {
-        if (! $entity->isEmpty() && ! ($key = $entity->getFieldId())) {
+        if (!$entity->isEmpty() && !($key = $entity->getFieldId())) {
             throw new \InvalidArgumentException('appending not supported');
         }
 
@@ -139,7 +140,7 @@ class CustomFieldsCollection extends AbstractLazyCollection
 
     public function offsetSet($key, $value)
     {
-        if (! isset($key)) {
+        if (!isset($key)) {
             return $this->add($value);
         }
 

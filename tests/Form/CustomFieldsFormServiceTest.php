@@ -9,7 +9,7 @@ class CustomFieldsFormServiceTest extends TestCase
 {
     public function testEmptyConfig()
     {
-        $service = new CustomFieldsFormService(array());
+        $service = $this->getFormService(array());
         $form = $this->getMockForm('SomeEntityClass');
         $form->expects($this->never())->method('add');
 
@@ -18,7 +18,7 @@ class CustomFieldsFormServiceTest extends TestCase
 
     public function testEmptyConfigNoEntity()
     {
-        $service = new CustomFieldsFormService(array());
+        $service = $this->getFormService(array());
         $form = $this->getMockForm();
         $form->expects($this->never())->method('add');
 
@@ -27,7 +27,7 @@ class CustomFieldsFormServiceTest extends TestCase
 
     public function testEmptyConfigNothing()
     {
-        $service = new CustomFieldsFormService(array());
+        $service = $this->getFormService(array());
         $form = $this->getMockForm();
         $form->expects($this->never())->method('add');
 
@@ -37,7 +37,7 @@ class CustomFieldsFormServiceTest extends TestCase
 
     public function testEmptyConfigBoth()
     {
-        $service = new CustomFieldsFormService(array());
+        $service = $this->getFormService(array());
         $form = $this->getMockForm('EntityClass1');
         $form->expects($this->never())->method('add');
 
@@ -50,19 +50,19 @@ class CustomFieldsFormServiceTest extends TestCase
         $config = array(
             'EntityClassX' => array(
                 'fieldOfX' => array(
-                    'field_type' => 'text',
+                    'type' => '...\TextType',
                 ),
             ),
             'EntityClassB' => array(
                 'fieldR' => array(
-                    'field_type' => 'text',
+                    'type' => '...\TextType',
                 ),
                 'fieldS' => array(
-                    'field_type' => 'date',
+                    'type' => '...\DateType',
                 ),
             ),
         );
-        $service = new CustomFieldsFormService($config);
+        $service = $this->getFormService($config);
         $form = $this->getMockForm('EntityClassB');
         $form->expects($this->exactly(2))->method('add');
 
@@ -89,5 +89,12 @@ class CustomFieldsFormServiceTest extends TestCase
         ;
 
         return $mock;
+    }
+
+    private function getFormService(array $config)
+    {
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')->getMock();
+
+        return new CustomFieldsFormService($config, $em);
     }
 }

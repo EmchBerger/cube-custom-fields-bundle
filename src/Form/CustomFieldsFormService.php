@@ -3,7 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Form;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forminterface;
@@ -16,9 +16,9 @@ class CustomFieldsFormService
     /**
      * Constructor of service.
      *
-     * @param array $fieldsConfig Configuration of entities with CustomFields from the bundles configuration.
+     * @param array $fieldsConfig Configuration of entities with CustomFields from the bundles configuration
      */
-    public function __construct(array $fieldsConfig, EntityManager $em)
+    public function __construct(array $fieldsConfig, EntityManagerInterface $em)
     {
         $this->fieldsConfig = $fieldsConfig;
         $this->em = $em;
@@ -27,8 +27,8 @@ class CustomFieldsFormService
     /**
      * Add all Custom Fields to the form.
      *
-     * @param FormBuilderInterface|FormInterface $form      the form to add the entities to
-     * @param string                             $dataClass entity to set the fields for, only when forms data_class is not set.
+     * @param FormBuilderInterface|FormInterface $form            the form to add the entities to
+     * @param string                             $dataClass       entity to set the fields for, only when forms data_class is not set
      * @param array                              $overrideOptions optionally override form configuration options
      * @param boolean                            $reverseAsString must be set to true in order for ajaxSelect2 field to work properly in filtering mode (refer to cubetools\cube-common-bundle)
      *
@@ -79,6 +79,7 @@ class CustomFieldsFormService
                     foreach ($filters as $field => $value) {
                         $qb->andWhere(sprintf('customField.%s = :%s', $field, $field))->setParameter($field, $value);
                     }
+
                     return $qb;
                 };
             }
@@ -107,7 +108,7 @@ class CustomFieldsFormService
             }
             // add model transformer for entity type fields
             if (EntityMapper::isEntityField($field['type'])) {
-                $form->get($name)->addModelTransformer( new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, $reverseAsString)) ;
+                $form->get($name)->addModelTransformer(new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, $reverseAsString));
             }
         }
     }

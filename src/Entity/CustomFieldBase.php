@@ -118,6 +118,7 @@ abstract class CustomFieldBase
                 }
             }
         }
+
         return null;
     }
 
@@ -126,5 +127,5 @@ abstract class CustomFieldBase
      *
      * @return string
      */
-    abstract static public function getStorageFieldName();
+    abstract public static function getStorageFieldName();
 }
