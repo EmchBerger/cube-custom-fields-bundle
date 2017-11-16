@@ -12,7 +12,7 @@ class CustomFieldsCollectionTest extends TestCase
     {
         global $kernel;
         if (!$kernel || 'M' === get_class($kernel)[0]) { // kernel is not set or is Mocked class
-            // create mocked container in mocked kernel for CustomFieldBase
+            // create mocked container in mocked kernel for UnsavedCustomField
             $config = array('testGetSet' => array('notYetExisting' => array('type' => 'Symfony\Component\Form\Extension\Core\Type\TextType')));
             $mockContainer = $this->getMockBuilder('dummy\Container')
                 ->disableAutoload()

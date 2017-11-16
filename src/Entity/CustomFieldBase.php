@@ -16,16 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 abstract class CustomFieldBase
 {
-    protected $config;
     protected $strRepresentationOnFlushCreated;
-
-    public function __construct()
-    {
-        // TODO: find a better way to retrieve the parameters from custom_fields.yml
-        global $kernel;
-        $this->config = $kernel->getContainer()->getParameter('cubetools.customfields.entities');
-        $this->strRepresentationOnFlushCreated = false;
-    }
 
     /**
      * @var integer
@@ -165,24 +156,6 @@ abstract class CustomFieldBase
      * @return many
      */
     abstract public function getValue();
-
-    /**
-     * Returns the type according to the configuration
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        // traverse the config and return the type of the first matching element
-        $fieldId = $this->getFieldId();
-        foreach ($this->config as $entity) {
-            if (isset($entity[$fieldId])) {
-                return $entity[$fieldId]['type'];
-            }
-        }
-
-        return null;
-    }
 
     /**
      * Get name of DB storage field of this custom field.
