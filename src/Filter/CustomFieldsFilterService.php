@@ -22,10 +22,7 @@ class CustomFieldsFilterService
         if (!$firstRootAlias) {
                 $firstRootAlias = $qb->getRootAliases()[0];
         }
-        // check if custom fields have already be joined. If not, join now
-        if (!in_array('cf', $qb->getAllAliases())) {
-            $qb->leftJoin($firstRootAlias . '.customFields', 'cf');
-        }
+
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
                 $filterVal = $filterfield->getData();
@@ -71,18 +68,8 @@ class CustomFieldsFilterService
      */
     public function getFulltextFilterQueries($filterform, $ftFieldName, QueryBuilder $qb, $firstRootAlias = null)
     {
-        if (!isset($filterform[$ftFieldName]) || !$filterform[$ftFieldName]->getData()) {
-            // no fulltext filter value set
-            return array();
-        }
-
         if (!$firstRootAlias) {
                 $firstRootAlias = $qb->getRootAliases()[0];
-        }
-
-        // check if custom fields have already be joined. If not, join now
-        if (!in_array('cf', $qb->getAllAliases())) {
-            $qb->leftJoin($firstRootAlias . '.customFields', 'cf');
         }
 
         $fulltextCfQueries = array();
