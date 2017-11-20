@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="custom_fields")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn("discr_type", type="string")
+ * @ORM\HasLifecycleCallbacks()
  */
 abstract class CustomFieldBase
 {
@@ -33,13 +34,20 @@ abstract class CustomFieldBase
      */
     private $id;
 
-        /**
+    /**
      * @var string
      *
      * @ORM\Column(type="string", nullable=false)
      * @Assert\NotBlank()
      */
     private $fieldId;
+
+    /**
+     * @var text
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $strRepresentation;
 
     /**
      * Get id
@@ -74,6 +82,40 @@ abstract class CustomFieldBase
     public function getFieldId()
     {
         return $this->fieldId;
+    }
+
+    /**
+     * Set the string representation of the custom field automatically during persisting
+     *
+     * @param string $str
+     *
+     * @return $this
+     *
+     */
+    public function setStrRepresentation($str)
+    {
+        $this->strRepresentation = $str;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function storeStrRepresentation()
+    {
+        $this->setStrRepresentation($this->createStrRepresentation());
+    }
+
+    /**
+     * Creates the string representation of the custom field. Should be overriden if required by the extending class.
+     *
+     * @return str
+     */
+    public function createStrRepresentation()
+    {
+        return $this->__toString();
     }
 
     /**

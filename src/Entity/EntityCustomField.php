@@ -68,6 +68,23 @@ class EntityCustomField extends CustomFieldBase
     }
 
     /**
+     * Override the default string representation creator method
+     *
+     * @return string
+     */
+    public function createStrRepresentation()
+    {
+        $entity = $this->getEntityData();
+        if (is_array($entity) || $entity instanceof \ArrayAccess) {
+            return implode("\x1E", $entity); // ASCII "record separator" character
+        } elseif ($entity) {
+            return $entity->__toString();
+        } else {
+            return '';
+        }
+    }
+
+    /**
      * Returns true when the entity (its value) is empty.
      *
      * @return boolean
