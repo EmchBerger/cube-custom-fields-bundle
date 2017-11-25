@@ -23,6 +23,7 @@ abstract class CustomFieldBase
         // TODO: find a better way to retrieve the parameters from custom_fields.yml
         global $kernel;
         $this->config = $kernel->getContainer()->getParameter('cubetools.customfields.entities');
+        $this->strRepresentationOnFlushCreated = false;
     }
 
     /**
@@ -105,7 +106,16 @@ abstract class CustomFieldBase
      */
     public function storeStrRepresentation()
     {
-        $this->setStrRepresentation($this->createStrRepresentation());
+        if (!$this->strRepresentationOnFlushCreated) {
+            // we only want to store the string representation during update if it has not yet been done as part of the flush cycle of a related entity (refer to the EventListener)
+            $this->setStrRepresentation($this->createStrRepresentation());
+        }
+    }
+
+    public function storeStrRepresentationOnFlush($flushEntity)
+    {
+        $this->strRepresentationOnFlushCreated = true;
+        $this->setStrRepresentation($this->createStrRepresentationOnFlush($flushEntity));
     }
 
     /**
@@ -114,6 +124,16 @@ abstract class CustomFieldBase
      * @return str
      */
     public function createStrRepresentation()
+    {
+        return $this->__toString();
+    }
+
+    /**
+     * Creates the string representation of the custom field during flush of a possibly related entity. Should be overriden if required by the extending class.
+     *
+     * @return str
+     */
+    public function createStrRepresentationOnFlush($flushEntity)
     {
         return $this->__toString();
     }
