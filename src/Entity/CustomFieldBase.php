@@ -12,16 +12,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="custom_fields")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn("discr_type", type="string")
+ * @ORM\HasLifecycleCallbacks()
  */
 abstract class CustomFieldBase
 {
     protected $config;
+    protected $strRepresentationOnFlushCreated;
 
     public function __construct()
     {
         // TODO: find a better way to retrieve the parameters from custom_fields.yml
         global $kernel;
         $this->config = $kernel->getContainer()->getParameter('cubetools.customfields.entities');
+        $this->strRepresentationOnFlushCreated = false;
     }
 
     /**
@@ -33,13 +36,20 @@ abstract class CustomFieldBase
      */
     private $id;
 
-        /**
+    /**
      * @var string
      *
      * @ORM\Column(type="string", nullable=false)
      * @Assert\NotBlank()
      */
     private $fieldId;
+
+    /**
+     * @var text
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $strRepresentation;
 
     /**
      * Get id
@@ -74,6 +84,59 @@ abstract class CustomFieldBase
     public function getFieldId()
     {
         return $this->fieldId;
+    }
+
+    /**
+     * Set the string representation of the custom field automatically during persisting
+     *
+     * @param string $str
+     *
+     * @return $this
+     *
+     */
+    public function setStrRepresentation($str)
+    {
+        $this->strRepresentation = $str;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function storeStrRepresentation()
+    {
+        if (!$this->strRepresentationOnFlushCreated) {
+            // we only want to store the string representation during update if it has not yet been done as part of the flush cycle of a related entity (refer to the EventListener)
+            $this->setStrRepresentation($this->createStrRepresentation());
+        }
+    }
+
+    public function storeStrRepresentationOnFlush($flushEntity)
+    {
+        $this->strRepresentationOnFlushCreated = true;
+        $this->setStrRepresentation($this->createStrRepresentationOnFlush($flushEntity));
+    }
+
+    /**
+     * Creates the string representation of the custom field. Should be overriden if required by the extending class.
+     *
+     * @return str
+     */
+    public function createStrRepresentation()
+    {
+        return $this->__toString();
+    }
+
+    /**
+     * Creates the string representation of the custom field during flush of a possibly related entity. Should be overriden if required by the extending class.
+     *
+     * @return str
+     */
+    public function createStrRepresentationOnFlush($flushEntity)
+    {
+        return $this->__toString();
     }
 
     /**
