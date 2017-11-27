@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 abstract class CustomFieldBase
 {
     protected $config;
+    protected $strRepresentationOnFlushCreated;
 
     public function __construct()
     {
