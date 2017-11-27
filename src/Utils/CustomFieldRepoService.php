@@ -154,7 +154,7 @@ class CustomFieldRepoService
     /**
      * Retrieves all customField entities (with fieldId = $fieldId) which point to something which resolves as $str
      * @param type $fieldId The identifier of the customField to search through
-     * @param type $str  The string which must match the __toString() method of the custom field
+     * @param type $str     The string which must match the string representation of the custom field
      * @return array        Contains all found customField entities, which point to $str
      */
     public function getCustomFieldEntitiesForString($fieldId, $str)
@@ -167,57 +167,16 @@ class CustomFieldRepoService
         $config = $this->configReader->getConfigForFieldId($fieldId);
         $formType = $config['type'];
         $entityClass = EntityMapper::getCustomFieldClass($formType);
-        $simpleQuery = false;
-        switch ($entityClass) {
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField':
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField':
-                $simpleQuery = true;
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField';
-                $er = $this->em->getRepository($entityClass);
-                break;
-
-            default:
-                $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField');
-                break;
-        }
 
         // retrieve the customField entities from the database
-        if ($simpleQuery) {
-            $dbField = $entityClass::getStorageFieldName();
-            $containingCustomFields = $er->createQueryBuilder('cf')
-                    ->andWhere('cf.fieldId = :fieldId')
-                    ->andWhere('cf.' . $dbField . ' LIKE :str')
-                    ->setParameters(array(
-                        'fieldId' => $fieldId,
-                        'str' => '%' . $str . '%',
-            ))->getQuery()->getResult();
-        } else {
-            $customFieldEntities = $er->findBy(array('fieldId' => $fieldId));
-            // traverse the customField entities and check if they resolve as $str
-            $containingCustomFields = array();
-            foreach ($customFieldEntities as $cfEntity) {
-                if ($cfEntity->isEmpty()) {
-                    // empty values can occur if the cleanup of empty custom fields is not correctly done
-                    continue;
-                }
-                $cfEntityVal = $cfEntity->getValue();
-                if (is_array($cfEntityVal) || $cfEntityVal instanceof \ArrayAccess) {
-                    // the customField contains an array of entities
-                    foreach ($cfEntityVal as $content) {
-                        // we filter by an object
-                        if ($content && self::compareStrings($str, $content)) {
-                            $containingCustomFields[] = $cfEntity;
-                            break;
-                        }
-                    }
-                } else {
-                    // the customField contains a single entity
-                    if (self::compareStrings($str, $cfEntityVal)) {
-                        $containingCustomFields[] = $cfEntity;
-                    }
-                }
-            }
-        }
+        $er = $this->em->getRepository($entityClass);
+        $containingCustomFields = $er->createQueryBuilder('cf')
+                ->andWhere('cf.fieldId = :fieldId')
+                ->andWhere('cf.strRepresentation LIKE :strRepresentation')
+                ->setParameters(array(
+                    'fieldId' => $fieldId,
+                    'strRepresentation' => '%' . $str . '%',
+        ))->getQuery()->getResult();
 
         return $containingCustomFields;
     }
@@ -229,44 +188,5 @@ class CustomFieldRepoService
         } else {
             return $a == $b;
         }
-    }
-
-    /**
-     * checks if $a is substring of $b
-     * @param type $a
-     * @param type $b
-     * @return boolean
-     */
-    private function compareStrings($a, $b)
-    {
-        $aStr = $this->convertToString($a);
-        if ($aStr === null) {
-            return false;
-        }
-        $bStr = $this->convertToString($b);
-        if ($bStr === null) {
-            return false;
-        }
-
-        return (stripos($bStr, $aStr) !== false);
-    }
-
-    /**
-     * tries to convert $obj to string type. If unsuccessful, returns null
-     * @param type $obj
-     */
-    private function convertToString($obj)
-    {
-        if (is_string($obj)) {
-            $objStr = $obj;
-        } elseif ($obj instanceof \DateTime) {
-            $objStr = $obj->format('d.m.Y'); // TODO: this MUST be dynamic based on the locale!
-        } elseif (method_exists($obj, '__toString')) {
-            $objStr = $obj->__toString();
-        } else {
-            return null;
-        }
-
-        return $objStr;
     }
 }

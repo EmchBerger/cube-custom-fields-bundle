@@ -26,3 +26,8 @@ services:
         autoconfigure: true
         arguments:
             $config: '%cubetools.customfields.entities%'
+    CubeTools\CubeCustomFieldsBundle\EventListener\CustomFieldLinkedEntityListener:
+        autowire: true
+        autoconfigure: true
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
