@@ -35,6 +35,11 @@ class TextareaCustomField extends CustomFieldBase
         return $this->textValue;
     }
 
+    public function __toString()
+    {
+        return $this->textValue;
+    }
+
     public static function getStorageFieldName()
     {
         return 'textValue';

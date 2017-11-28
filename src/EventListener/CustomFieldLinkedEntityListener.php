@@ -4,7 +4,6 @@ namespace CubeTools\CubeCustomFieldsBundle\EventListener;
 use CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader;
 use CubeTools\CubeCustomFieldsBundle\Utils\CustomFieldRepoService;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\Common\Persistence\ObjectManager;
 
 class CustomFieldLinkedEntityListener
 {
