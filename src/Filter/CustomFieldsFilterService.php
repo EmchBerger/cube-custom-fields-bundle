@@ -17,11 +17,14 @@ class CustomFieldsFilterService
         $this->repo = $repo;
     }
 
-    public function applyFilter($entityClass, $filterform, QueryBuilder $qb, $firstRootAlias = null)
+    public function applyFilter($filterform, QueryBuilder $qb, $firstRootAlias = null)
     {
         if (!$firstRootAlias) {
                 $firstRootAlias = $qb->getRootAliases()[0];
         }
+
+        $entityClass = $qb->getRootEntities()[0];
+
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
                 $filterVal = $filterfield->getData();

@@ -2,7 +2,6 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\Form;
 
 /**
@@ -12,12 +11,10 @@ use Symfony\Component\Form\Form;
 class CustomFieldIndexService
 {
     private $configReader;
-    private $em;
 
-    public function __construct(ConfigReader $configReader, EntityManager $em)
+    public function __construct(ConfigReader $configReader)
     {
         $this->configReader = $configReader;
-        $this->em = $em;
     }
 
     /**
