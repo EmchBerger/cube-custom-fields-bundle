@@ -23,6 +23,8 @@ class CustomFieldsFilterService
                 $firstRootAlias = $qb->getRootAliases()[0];
         }
 
+        $entityClass = $qb->getRootEntities()[0];
+
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
                 $filterVal = $filterfield->getData();
@@ -46,10 +48,17 @@ class CustomFieldsFilterService
                     // now we want to retrieve all entities which are linked with at least one of the customFields
                     $inArrClause = array();
                     foreach ($cfArr as $cf) {
-                        $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId('AppBundle:Reservation', $cf);
-                        $inArrClause[] = $firstRootAlias.'.id IN ('.implode(',', $relevantEntitiesIds).')';
+                        $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId($entityClass, $cf);
+                        if (count($relevantEntitiesIds)) {
+                            $inArrClause[] = $firstRootAlias.'.id IN ('.implode(',', $relevantEntitiesIds).')';
+                        }
                     }
-                    $qb->andWhere(implode(' OR ', $inArrClause));
+                    if (count($inArrClause)) {
+                        $qb->andWhere(implode(' OR ', $inArrClause));
+                    } else {
+                        // no entity linked with the relevant customFields
+                        $qb->andWhere("TRUE = FALSE");
+                    }
                 } else {
                     // no custom field contains the requested value. Therefore, no entry can satisfy the filter criteria and we can directly skip all further fields.
                     $qb->andWhere("TRUE = FALSE");
@@ -72,6 +81,8 @@ class CustomFieldsFilterService
                 $firstRootAlias = $qb->getRootAliases()[0];
         }
 
+        $entityClass = $qb->getRootEntities()[0];
+
         $fulltextCfQueries = array();
         $fulltextString = $filterform[$ftFieldName]->getData();
         foreach ($filterform as $filterfield) {
@@ -86,7 +97,7 @@ class CustomFieldsFilterService
                     // now we want to retrieve all entities which are linked with at least one of the customFields
                     $inArrClause = array();
                     foreach ($cfArr as $cf) {
-                        $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId('AppBundle:Reservation', $cf);
+                        $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId($entityClass, $cf);
                         $inArrClause[] = $firstRootAlias . '.id IN (' . join(',', $relevantEntitiesIds) . ')';
                     }
                     $fulltextCfQueries = array_merge($fulltextCfQueries, $inArrClause);
