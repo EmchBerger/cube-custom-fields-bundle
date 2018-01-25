@@ -37,7 +37,6 @@ class CustomFieldUpdateCommand extends ContainerAwareCommand
         $listenerInst = null;
         foreach ($em->getEventManager()->getListeners() as $event => $listeners) {
             foreach ($listeners as $hash => $listener) {
-                //dump($listener);
                 if ($listener instanceof \CubeTools\CubeCustomFieldsBundle\EventListener\CustomFieldLinkedEntityListener) {
                     $listenerInst = $listener;
                     break 2;

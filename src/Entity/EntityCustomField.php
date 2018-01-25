@@ -140,7 +140,7 @@ class EntityCustomField extends CustomFieldBase
         if ($this->entityValue && $this->entityValue['entityClass']) {
             // TODO: find a better way to retrieve the entity manager
             global $kernel;
-            $em = $kernel->getContainer()->getDoctrine_Orm_DefaultEntityManagerService();
+            $em = $kernel->getContainer()->get('doctrine');
             if (is_array($this->entityValue) && is_array($this->entityValue['entityId'])) {
                 // multiple
                 $entityData = $em->getRepository($this->entityValue['entityClass'])->findById($this->entityValue['entityId']); // in this case, $this->entityValue['entityId'] contains an array of entity IDs
