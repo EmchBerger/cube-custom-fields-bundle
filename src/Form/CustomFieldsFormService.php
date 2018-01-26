@@ -3,7 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Form;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forminterface;
@@ -11,17 +11,17 @@ use Symfony\Component\Form\Forminterface;
 class CustomFieldsFormService
 {
     private $fieldsConfig = null;
-    private $em;
+    private $er;
 
     /**
      * Constructor of service.
      *
      * @param array $fieldsConfig Configuration of entities with CustomFields from the bundles configuration
      */
-    public function __construct(array $fieldsConfig, EntityManagerInterface $em)
+    public function __construct(array $fieldsConfig, ManagerRegistry $er)
     {
         $this->fieldsConfig = $fieldsConfig;
-        $this->em = $em;
+        $this->er = $er;
     }
 
     /**
@@ -60,6 +60,7 @@ class CustomFieldsFormService
         if (!isset($this->fieldsConfig[$entityClass])) {
             return; // nothing to do
         }
+
         $fields = $this->fieldsConfig[$entityClass];
         foreach ($fields as $name => $field) {
             $fieldOverrideOptions = $overrideOptions;
@@ -71,6 +72,7 @@ class CustomFieldsFormService
                 $options['label'] = $field['label'];
             }
             $fieldType = $field['type'];
+
             if (isset($field['filters']) && $fieldType != 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
                 // add repository method for filtering specific fieldIds (only makes sense for EntityType fields used as Selects)
                 $filters = $field['filters'];
@@ -83,17 +85,21 @@ class CustomFieldsFormService
                     return $qb;
                 };
             }
+
             // define the options
             if ($fieldType == 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
                 // automatically set route and remote parameters
                 $field['field_options']['remote_route'] = 'cube_custom_fields_ajax';
                 $field['field_options']['remote_params']['fieldId'] = $name;
             }
+
             if (isset($field['field_options'])) {
                 $options = array_merge($options, $field['field_options']);
             }
+
             // create draft of form field without override options
             $form->add($name, $fieldType, $options);
+
             // apply options override
             if (count($fieldOverrideOptions)) {
                 if (!$form->get($name)->hasOption('multiple')) {
@@ -108,7 +114,7 @@ class CustomFieldsFormService
             }
             // add model transformer for entity type fields
             if (EntityMapper::isEntityField($field['type'])) {
-                $form->get($name)->addModelTransformer(new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->em, $fieldType, $reverseAsString));
+                $form->get($name)->addModelTransformer(new \CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityCustomFieldTransformer($this->er->getManager(), $fieldType, $reverseAsString));
             }
         }
     }

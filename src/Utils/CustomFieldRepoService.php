@@ -3,7 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * This service allows to get IDs of customField entities (base entities)
@@ -12,12 +12,12 @@ use Doctrine\ORM\EntityManager;
 class CustomFieldRepoService
 {
     private $configReader;
-    private $em;
+    private $mr;
 
-    public function __construct(ConfigReader $configReader, EntityManager $em)
+    public function __construct(ConfigReader $configReader, ManagerRegistry $mr)
     {
         $this->configReader = $configReader;
-        $this->em = $em;
+        $this->mr = $mr;
     }
 
     /**
@@ -30,7 +30,7 @@ class CustomFieldRepoService
      */
     public function getEntitiesIdsForCustomFieldId($entityClass, $customFieldId)
     {
-        $qb = $this->em->getRepository($entityClass)->createQueryBuilder('e');
+        $qb = $this->mr->getManager()->getRepository($entityClass)->createQueryBuilder('e');
         $qb->join('e.customFields', 'cf')
            ->select('e.id')
            ->where('cf.id = :id')
@@ -84,11 +84,11 @@ class CustomFieldRepoService
                 $simpleQuery = true;
                 // no break, set $er below
             case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField':
-                $er = $this->em->getRepository($entityClass);
+                $er = $this->mr->getManger()->getRepository($entityClass);
                 break;
 
             default:
-                $er = $this->em->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField');
+                $er = $this->mr->getManger()->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField');
                 break;
         }
 
@@ -169,7 +169,7 @@ class CustomFieldRepoService
         $entityClass = EntityMapper::getCustomFieldClass($formType);
 
         // retrieve the customField entities from the database
-        $er = $this->em->getRepository($entityClass);
+        $er = $this->mr->getManger()->getRepository($entityClass);
         $containingCustomFields = $er->createQueryBuilder('cf')
                 ->andWhere('cf.fieldId = :fieldId')
                 ->andWhere('cf.strRepresentation LIKE :strRepresentation')
