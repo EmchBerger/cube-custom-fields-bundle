@@ -94,7 +94,9 @@ class CustomFieldsFormServiceTest extends TestCase
     private function getFormService(array $config)
     {
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')->getMock();
+        $mr = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $mr->expects($this->any())->method('getManager')->willReturn($em);
 
-        return new CustomFieldsFormService($config, $em);
+        return new CustomFieldsFormService($config, $mr);
     }
 }
