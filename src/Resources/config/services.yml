@@ -8,7 +8,7 @@ services:
         class: CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService
         arguments:
             - '%cubetools.customfields.entities%'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
     CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
     CubeTools\CubeCustomFieldsBundle\Filter\:
         autowire: true

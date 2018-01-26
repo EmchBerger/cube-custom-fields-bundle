@@ -13,7 +13,7 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
 {
     private $em;
     private $fieldType;
-    private $reverseAsSting;
+    private $reverseAsString;
 
     public function __construct(EntityManager $em, $fieldType, $reverseAsString = false)
     {
@@ -23,7 +23,7 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a collection of EntityCustomField elements or a single EntityCustomField element into persisted (merged) entities
+     * No real transformation required in forward direction
      *
      * @return mixed An array of entities
      *
@@ -31,24 +31,7 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
      */
     public function transform($collection)
     {
-        if (null === $collection) {
-            return array();
-        }
-        if (is_array($collection) || $collection instanceof \ArrayAccess) {
-            // multiple entities
-            // persist entities if required
-            $mergedArray = array();
-            foreach ($collection as $entity) {
-                if (!$this->em->contains($entity)) {
-                    $mergedArray[] = $this->em->merge($entity);
-                }
-            }
-
-            return $mergedArray;
-        } else {
-            // single entity (the collection is an entity)
-            return $this->em->merge($collection);
-        }
+        return $collection;
     }
 
     /**
