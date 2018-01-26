@@ -88,7 +88,7 @@ class CustomFieldRepoService
                 break;
 
             default:
-                $er = $this->mr->getManger()->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField');
+                $er = $this->mr->getManager()->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField');
                 break;
         }
 
@@ -169,7 +169,7 @@ class CustomFieldRepoService
         $entityClass = EntityMapper::getCustomFieldClass($formType);
 
         // retrieve the customField entities from the database
-        $er = $this->mr->getManger()->getRepository($entityClass);
+        $er = $this->mr->getManager()->getRepository($entityClass);
         $containingCustomFields = $er->createQueryBuilder('cf')
                 ->andWhere('cf.fieldId = :fieldId')
                 ->andWhere('cf.strRepresentation LIKE :strRepresentation')
