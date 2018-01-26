@@ -98,7 +98,9 @@ class CustomFieldsFilterService
                     $inArrClause = array();
                     foreach ($cfArr as $cf) {
                         $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId($entityClass, $cf);
-                        $inArrClause[] = $firstRootAlias . '.id IN (' . join(',', $relevantEntitiesIds) . ')';
+                        if (count($relevantEntitiesIds)) {
+                            $inArrClause[] = $firstRootAlias . '.id IN (' . join(',', $relevantEntitiesIds) . ')';
+                        }
                     }
                     $fulltextCfQueries = array_merge($fulltextCfQueries, $inArrClause);
                 }
