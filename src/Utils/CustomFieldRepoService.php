@@ -84,7 +84,7 @@ class CustomFieldRepoService
                 $simpleQuery = true;
                 // no break, set $er below
             case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField':
-                $er = $this->mr->getManger()->getRepository($entityClass);
+                $er = $this->mr->getManager()->getRepository($entityClass);
                 break;
 
             default:
