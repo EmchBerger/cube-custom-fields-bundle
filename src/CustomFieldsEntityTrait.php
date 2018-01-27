@@ -42,10 +42,14 @@ trait CustomFieldsEntityTrait
     /**
      * Get custom field entities which have a value set.
      *
+     * @deprecated since version 1.3.5 use {@see getNonemptyCustomFields()} instead, it tells clearer what happens
+     *
      * @return BaseCustomField[]
      */
     public function getCustomFields()
     {
+        @trigger_error(__METHOD__.' is deprecated, use getNonemptyCustomFields() instead', E_USER_DEPRECATED);
+
         return $this->getNonemptyCustomFields();
     }
 
@@ -59,13 +63,20 @@ trait CustomFieldsEntityTrait
         return $this->customFields;
     }
 
+    /**
+     * @deprecated since version 1.3.5, is probably unused
+     */
     public function hasCustomField($customField)
     {
+        @trigger_error(__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         return $this->customFields->contains($customField);
     }
 
     /**
      * Set custom fields entities.
+     *
+     * @deprecated since version 1.3.5, is probably unused and dangerous
      *
      * @param ArrayCollection $customFields
      *
@@ -73,13 +84,20 @@ trait CustomFieldsEntityTrait
      */
     public function setCustomFields(ArrayCollection $customFields)
     {
+        @trigger_error(__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         $this->customFields = $customFields;
 
         return $this;
     }
 
+    /**
+     * @deprecated since version 1.3.5, is probably unused
+     */
     public function addCustomField(CustomFieldBase $customField)
     {
+        @trigger_error(__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         CustomFieldsGetSet::setField($this, $customField);
     }
 
