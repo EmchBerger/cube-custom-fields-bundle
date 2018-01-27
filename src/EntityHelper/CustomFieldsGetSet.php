@@ -146,11 +146,9 @@ class CustomFieldsGetSet
     private static function getEntityType($owningEntity, $key)
     {
         $config = self::getConfig();
-        // traverse the config and return the type of the first matching element
-        foreach ($config as $entity) {
-            if (isset($entity[$key])) {
-                return $entity[$key]['type'];
-            }
+        $owningClass = get_class($owningEntity);
+        if (isset($config[$owningClass][$key])) {
+            return $config[$owningClass][$key]['type'];
         }
 
         return null;
