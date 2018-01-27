@@ -2,7 +2,8 @@
 
 namespace CubeTools\CubeCustomFieldsBundle;
 
-use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsCollection;
+use CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase;
+use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsGetSet;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,11 +40,21 @@ trait CustomFieldsEntityTrait
     }
 
     /**
-     * Get custom field entities.
+     * Get custom field entities which have a value set.
      *
      * @return BaseCustomField[]
      */
     public function getCustomFields()
+    {
+        return $this->getNonemptyCustomFields();
+    }
+
+    /**
+     * Get custom field entities which have a value set.
+     *
+     * @return BaseCustomField[]
+     */
+    public function getNonemptyCustomFields()
     {
         return $this->customFields;
     }
@@ -67,19 +78,19 @@ trait CustomFieldsEntityTrait
         return $this;
     }
 
-    public function addCustomField($customField)
+    public function addCustomField(CustomFieldBase $customField)
     {
-        $this->customFields[$customField->getFieldId()] = $customField;
+        CustomFieldsGetSet::setField($this, $customField);
+    }
+
+    public function setCustomField($fieldId, $value)
+    {
+        CustomFieldsGetSet::setValue($this, $fieldId, $value);
     }
 
     public function getCustomField($fieldId)
     {
-        if (!isset($this->customFields[$fieldId])) {
-            // TODO: here we need to check whether the fieldId is available for the entity at all (based on the configuration)
-            return null;
-        }
-
-        return $this->customFields[$fieldId]->getValue();
+        return CustomFieldsGetSet::getValue($this, $fieldId);
     }
 
     /**
@@ -102,15 +113,6 @@ trait CustomFieldsEntityTrait
      */
     public function __set($name, $value)
     {
-        // create CustomFieldCollection
-        $customFields = new CustomFieldsCollection($this->customFields);
-        // get the corresponding field for $name
-        $customField = $customFields->get($name);
-        // set the $value for the field
-        $customField->setValue($value);
-        // save the changed (or added) field back into the collection
-        $customFields->set($name, $customField);
-        // save the full list of CustomFieldBase entities as ArrayCollection back to the customFields variable of the main entity
-        $this->setCustomFields($customFields->toArrayCollection());
+        $this->setCustomField($name, $value);
     }
 }
