@@ -74,7 +74,7 @@ class CustomFieldsGetSet
         /** @var Collection */
         $customFields = $owningEntity->getNonemptyCustomFields();
         if ($entity instanceof UnsavedCustomField) {
-            $entity = self::createRealEntity($entity);
+            $entity = self::createRealEntity($owningEntity, $entity);
             $entity->setFieldId($key);
         } elseif ($entity->getFieldId() !== $key) {
             $entity = clone $entity;
@@ -115,21 +115,59 @@ class CustomFieldsGetSet
     /**
      * Creates a real entity from the unsaved one.
      *
+     * @param object $owningEntity
      * @param \CubeTools\CubeCustomFieldsBundle\EntityHelper\UnsavedCustomField $tempEntity
      *
      * @return \CubeTools\CubeCustomFieldsBundle\Entity\*CustomField
      *
      * @throws \InvalidArgumentException
      */
-    private static function createRealEntity(UnsavedCustomField $tempEntity)
+    private static function createRealEntity($owningEntity, UnsavedCustomField $tempEntity)
     {
         $value = $tempEntity->getValue();
-        $formType = $tempEntity->getType();
+        $key = $tempEntity->getFieldId();
+        $formType = self::getEntityType($owningEntity, $key);
         $customFieldType = EntityMapper::getCustomFieldClass($formType);
         $entity = new $customFieldType();
         $entity->setValue($value);
         // do not set $entity->setFieldId($tempEntity->getFieldId), is set later anyway
 
         return $entity;
+    }
+
+    /**
+     * Returns the type according to the configuration.
+     *
+     * @param object $owningEntity
+     * @param string $key
+     *
+     * @return string|null
+     */
+    private static function getEntityType($owningEntity, $key)
+    {
+        $config = self::getConfig();
+        // traverse the config and return the type of the first matching element
+        foreach ($config as $entity) {
+            if (isset($entity[$key])) {
+                return $entity[$key]['type'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the customfields config.
+     *
+     * @global type $kernel
+     *
+     * @return array config of customFields
+     */
+    private static function getConfig()
+    {
+        global $kernel;
+
+        // TODO: find a better way to retrieve the parameters from custom_fields.yml
+        return $kernel->getContainer()->getParameter('cubetools.customfields.entities');
     }
 }
