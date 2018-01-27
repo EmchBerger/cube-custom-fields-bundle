@@ -15,21 +15,19 @@ use Doctrine\Common\Collections\Collection;
 class CustomFieldsGetSet
 {
     /**
-     * Returns a new UnsavedCustomField if the key does not exist.
+     * Gets the customField, null if the key does not exist.
      *
      * @param object $owningEntity
      * @param string $key
      *
-     * @return CustomFieldBase
+     * @return CustomFieldBase|null
      */
     public static function getField($owningEntity, $key)
     {
         $entity = $owningEntity->getNonemptyCustomFields()->get($key);
 
         if (!$entity) {
-            // TODO: here we need to check whether the fieldId is available for the entity at all (based on the configuration)
-            $entity = new UnsavedCustomField();
-            $entity->setFieldId($key);
+            self::checkCustomFieldExists($owningEntity, $key);
         }
 
         return $entity;
@@ -50,7 +48,7 @@ class CustomFieldsGetSet
         if ($entity) {
             $value = $entity->getValue();
         } else {
-            // TODO: here we need to check whether the fieldId is available for the entity at all (based on the configuration)
+            self::checkCustomFieldExists($owningEntity, $key);
             $value = null;
         }
 
@@ -73,10 +71,7 @@ class CustomFieldsGetSet
         }
         /** @var Collection */
         $customFields = $owningEntity->getNonemptyCustomFields();
-        if ($entity instanceof UnsavedCustomField) {
-            $entity = self::createRealEntity($owningEntity, $entity);
-            $entity->setFieldId($key);
-        } elseif ($entity->getFieldId() !== $key) {
+        if ($entity->getFieldId() !== $key) {
             $entity = clone $entity;
             $entity->setFieldId($key);
         }
@@ -98,6 +93,9 @@ class CustomFieldsGetSet
             return;
         }
         $field = self::getField($owningEntity, $key);
+        if (is_null($field)) {
+            $field = self::createNewEntity($owningEntity, $key);
+        }
         $field->setValue($value);
         self::setField($owningEntity, $key, $field);
     }
@@ -113,24 +111,21 @@ class CustomFieldsGetSet
     }
 
     /**
-     * Creates a real entity from the unsaved one.
+     * Creates a new entity.
      *
      * @param object $owningEntity
-     * @param \CubeTools\CubeCustomFieldsBundle\EntityHelper\UnsavedCustomField $tempEntity
+     * @param string $key
      *
-     * @return \CubeTools\CubeCustomFieldsBundle\Entity\*CustomField
+     * @return CustomFieldBase
      *
      * @throws \InvalidArgumentException
      */
-    private static function createRealEntity($owningEntity, UnsavedCustomField $tempEntity)
+    private static function createNewEntity($owningEntity, $key)
     {
-        $value = $tempEntity->getValue();
-        $key = $tempEntity->getFieldId();
         $formType = self::getEntityType($owningEntity, $key);
         $customFieldType = EntityMapper::getCustomFieldClass($formType);
         $entity = new $customFieldType();
-        $entity->setValue($value);
-        // do not set $entity->setFieldId($tempEntity->getFieldId), is set later anyway
+        // do not set $entity->setFieldId($key) and ->setValue(), is set later
 
         return $entity;
     }
@@ -152,6 +147,22 @@ class CustomFieldsGetSet
         }
 
         return null;
+    }
+
+    /**
+     * Throws an error if the entity does not contain the custom field.
+     *
+     * @param object $owningEntity
+     * @param string $key
+     *
+     * @throws \LogicException
+     */
+    private static function checkCustomFieldExists($owningEntity, $key)
+    {
+        if (is_null(self::getEntityType($owningEntity, $key))) {
+            $msg = sprintf('CustomField "%s" does not exist for entity class "%s"', $key, get_class($owningEntity));
+            throw new \LogicException($msg);
+        }
     }
 
     /**
