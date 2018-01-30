@@ -113,7 +113,7 @@ class CustomFieldsFormService
                 $form->add($name, $fieldType, $options);
             }
             // add model transformer for entity type fields
-            if (EntityMapper::isEntityField($field['type']) && $reverseAsString) {
+            if (EntityMapper::isEntityField($field['type'])) {
                 $form->get($name)->addModelTransformer(
                     new DataTransformer\EntityCustomFieldTransformer($this->er->getManager(), $fieldType, $reverseAsString)
                 );
