@@ -1,6 +1,6 @@
 <?php
 
-namespace CubeTools\CubeCustomFieldsBundle\EntityHelper;
+namespace CubeTools\CubeCustomFieldsBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;

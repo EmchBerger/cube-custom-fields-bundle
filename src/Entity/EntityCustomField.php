@@ -2,6 +2,7 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
@@ -43,11 +44,14 @@ class EntityCustomField extends CustomFieldBase
                 $saveValue = $value->getId();
                 $saveClass = get_class($value);
             }
-            $this->entityValue = array(
-                'entityClass' => $saveClass,
-                'entityId' => $saveValue,
-            );
-            $this->entityData = $value;
+            if ($saveClass) {
+                $this->entityValue = array(
+                    'entityClass' => $saveClass,
+                    'entityId' => $saveValue,
+                );
+            } else {
+                $this->entityValue = null;
+            }
         } else {
             $this->entityValue = null;
             $this->entityData = null;
@@ -172,5 +176,21 @@ class EntityCustomField extends CustomFieldBase
     public static function getStorageFieldName()
     {
         return 'entityValue';
+    }
+
+    public function __clone()
+    {
+        $this->id = null;
+        $data = $this->getEntityData();
+        if (is_array($data)) {
+            $newData = new ArrayCollection();
+            foreach ($data as $d) {
+                $newData[] = $d;
+            }
+        } else {
+            $newData = $data;
+        }
+        $this->setValue($newData);
+        $this->setStrRepresentation($this->createStrRepresentation());
     }
 }
