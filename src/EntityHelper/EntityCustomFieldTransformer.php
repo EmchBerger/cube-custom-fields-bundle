@@ -31,6 +31,10 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
      */
     public function transform($collection)
     {
+        if ($collection instanceof \CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase) {
+            // in case of single entity, we have to make it managed (unclear why this is required)
+            return $this->em->merge($collection);
+        }
         return $collection;
     }
 
