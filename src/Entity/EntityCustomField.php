@@ -2,10 +2,13 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 /**
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class EntityCustomField extends CustomFieldBase
 {
@@ -15,6 +18,8 @@ class EntityCustomField extends CustomFieldBase
      * @ORM\Column(type="json_array")
      */
     private $entityValue;
+
+    private $entityData;
 
     /**
      * Set the value.
@@ -26,6 +31,10 @@ class EntityCustomField extends CustomFieldBase
     public function setValue($value = null)
     {
         if ($value) {
+            // store into temporary variable
+            $this->entityData = $value;
+
+            // store into database format
             if (is_array($value) || $value instanceof \ArrayAccess) {
                 // this is the case if multiple = true
                 $saveValue = array();
@@ -39,12 +48,17 @@ class EntityCustomField extends CustomFieldBase
                 $saveValue = $value->getId();
                 $saveClass = get_class($value);
             }
-            $this->entityValue = array(
-                'entityClass' => $saveClass,
-                'entityId' => $saveValue,
-            );
+            if ($saveClass) {
+                $this->entityValue = array(
+                    'entityClass' => $saveClass,
+                    'entityId' => $saveValue,
+                );
+            } else {
+                $this->entityValue = null;
+            }
         } else {
             $this->entityValue = null;
+            $this->entityData = null;
         }
 
         return $this;
@@ -59,7 +73,12 @@ class EntityCustomField extends CustomFieldBase
     {
         $entity = $this->getEntityData();
         if (is_array($entity) || $entity instanceof \ArrayAccess) {
-            return implode(', ', $entity);
+            // for some reason, implode does not work directly on the entity traversable
+            $strArr = array();
+            foreach ($entity as $e) {
+                $strArr[] = $e->__toString();
+            }
+            return implode(', ', $strArr);
         } elseif ($entity) {
             return $entity->__toString();
         } else {
@@ -76,7 +95,12 @@ class EntityCustomField extends CustomFieldBase
     {
         $entity = $this->getEntityData();
         if (is_array($entity) || $entity instanceof \ArrayAccess) {
-            return implode("\x1E", $entity); // ASCII "record separator" character
+            // for some reason, implode does not work directly on the entity traversable
+            $strArr = array();
+            foreach ($entity as $e) {
+                $strArr[] = $e->__toString();
+            }
+            return implode("\x1E", $strArr); // ASCII "record separator" character
         } elseif ($entity) {
             return $entity->__toString();
         } else {
@@ -131,16 +155,24 @@ class EntityCustomField extends CustomFieldBase
     }
 
     /**
-     * @global \Symfony\Component\HttpKernel\KernelInterface $kernel
-     *
      * @return object|ArrayCollection either returns an entity or an array collection of entities
      */
     private function getEntityData()
     {
+        return $this->entityData;
+    }
+
+    /**
+     * LifeCycleCallback PostLoad, loading entities from DataBase.
+     *
+     * @ORM\PostLoad
+     *
+     * @param LifecycleEventArgs $event
+     */
+    public function loadEntitiesAtLoad(LifecycleEventArgs $event)
+    {
         if ($this->entityValue && $this->entityValue['entityClass']) {
-            // TODO: find a better way to retrieve the entity manager
-            global $kernel;
-            $em = $kernel->getContainer()->get('doctrine')->getManager();
+            $em = $event->getEntityManager();
             if (is_array($this->entityValue) && is_array($this->entityValue['entityId'])) {
                 // multiple
                 $entityData = $em->getRepository($this->entityValue['entityClass'])->findById($this->entityValue['entityId']); // in this case, $this->entityValue['entityId'] contains an array of entity IDs
@@ -149,14 +181,31 @@ class EntityCustomField extends CustomFieldBase
                 $entityData = $em->getRepository($this->entityValue['entityClass'])->findOneById($this->entityValue['entityId']);
             }
 
-            return $entityData;
+            $this->entityData = $entityData;
         } else {
-            return null;
+            $this->entityData = null;
         }
     }
 
     public static function getStorageFieldName()
     {
         return 'entityValue';
+    }
+
+    public function __clone()
+    {
+        if ($this->getId()) {
+            // since doctrine makes special use of __clone, we need to make sure there is an id set already before cloning ourselves
+            $this->id = null;
+            $data = $this->getEntityData();
+            if (is_array($data)) {
+                $newData = new ArrayCollection($data);
+            } elseif ($data instanceof ArrayCollection) {
+                $newData = new ArrayCollection($data->toArray());
+            } else {
+                $newData = $data;
+            }
+            $this->setValue($newData);
+        }
     }
 }
