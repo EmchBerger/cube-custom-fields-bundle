@@ -4,20 +4,20 @@ namespace CubeTools\CubeCustomFieldsBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * Transformer for EntityCustomField
  */
 class EntityCustomFieldTransformer implements DataTransformerInterface
 {
-    private $em;
+    private $er;
     private $fieldType;
     private $reverseAsString;
 
-    public function __construct(EntityManager $em, $fieldType, $reverseAsString = false)
+    public function __construct(ManagerRegistry $er, $fieldType, $reverseAsString = false)
     {
-        $this->em = $em;
+        $this->er = $er;
         $this->fieldType = $fieldType;
         $this->reverseAsString = $reverseAsString;
     }
@@ -31,9 +31,11 @@ class EntityCustomFieldTransformer implements DataTransformerInterface
      */
     public function transform($collection)
     {
-        if ($collection instanceof \CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase) {
-            // in case of single entity, we have to make it managed (unclear why this is required)
-            return $this->em->merge($collection);
+        if ($collection && !is_array($collection) && !($collection instanceof \ArrayAccess)) {
+            // in case of single entity, we have to make sure it's managed
+            if (!$this->er->getManager()->contains($collection)) {
+                $collection = $this->er->getManager()->merge($collection);
+            }
         }
         return $collection;
     }

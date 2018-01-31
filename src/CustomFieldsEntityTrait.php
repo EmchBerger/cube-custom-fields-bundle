@@ -60,6 +60,9 @@ trait CustomFieldsEntityTrait
      */
     public function getNonemptyCustomFields()
     {
+        if (!$this->customFields) {
+            $this->initCustomFields();
+        }
         return $this->customFields;
     }
 
