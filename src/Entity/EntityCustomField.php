@@ -73,7 +73,12 @@ class EntityCustomField extends CustomFieldBase
     {
         $entity = $this->getEntityData();
         if (is_array($entity) || $entity instanceof \ArrayAccess) {
-            return implode(', ', $entity);
+            // for some reason, implode does not work directly on the entity traversable
+            $strArr = array();
+            foreach ($entity as $e) {
+                $strArr[] = $e->__toString();
+            }
+            return implode(', ', $strArr);
         } elseif ($entity) {
             return $entity->__toString();
         } else {
@@ -90,7 +95,12 @@ class EntityCustomField extends CustomFieldBase
     {
         $entity = $this->getEntityData();
         if (is_array($entity) || $entity instanceof \ArrayAccess) {
-            return implode("\x1E", $entity); // ASCII "record separator" character
+            // for some reason, implode does not work directly on the entity traversable
+            $strArr = array();
+            foreach ($entity as $e) {
+                $strArr[] = $e->__toString();
+            }
+            return implode("\x1E", $strArr); // ASCII "record separator" character
         } elseif ($entity) {
             return $entity->__toString();
         } else {
