@@ -194,17 +194,18 @@ class EntityCustomField extends CustomFieldBase
 
     public function __clone()
     {
-        $this->id = null;
-        $data = $this->getEntityData();
-        if (is_array($data)) {
-            $newData = new ArrayCollection();
-            foreach ($data as $d) {
-                $newData[] = $d;
+        if ($this->getId()) {
+            // since doctrine makes special use of __clone, we need to make sure there is an id set already before cloning ourselves
+            $this->id = null;
+            $data = $this->getEntityData();
+            if (is_array($data)) {
+                $newData = new ArrayCollection($data);
+            } elseif ($data instanceof ArrayCollection) {
+                $newData = new ArrayCollection($data->toArray());
+            } else {
+                $newData = $data;
             }
-        } else {
-            $newData = $data;
+            $this->setValue($newData);
         }
-        $this->setValue($newData);
-        $this->setStrRepresentation($this->createStrRepresentation());
     }
 }
