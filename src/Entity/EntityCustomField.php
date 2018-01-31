@@ -31,6 +31,10 @@ class EntityCustomField extends CustomFieldBase
     public function setValue($value = null)
     {
         if ($value) {
+            // store into temporary variable
+            $this->entityData = $value;
+
+            // store into database format
             if (is_array($value) || $value instanceof \ArrayAccess) {
                 // this is the case if multiple = true
                 $saveValue = array();
