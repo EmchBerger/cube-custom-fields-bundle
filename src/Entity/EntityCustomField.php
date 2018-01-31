@@ -4,9 +4,11 @@ namespace CubeTools\CubeCustomFieldsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 /**
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class EntityCustomField extends CustomFieldBase
 {
@@ -16,6 +18,8 @@ class EntityCustomField extends CustomFieldBase
      * @ORM\Column(type="json_array")
      */
     private $entityValue;
+
+    private $entityData;
 
     /**
      * Set the value.
@@ -50,6 +54,7 @@ class EntityCustomField extends CustomFieldBase
             }
         } else {
             $this->entityValue = null;
+            $this->entityData = null;
         }
 
         return $this;
@@ -136,16 +141,24 @@ class EntityCustomField extends CustomFieldBase
     }
 
     /**
-     * @global \Symfony\Component\HttpKernel\KernelInterface $kernel
-     *
      * @return object|ArrayCollection either returns an entity or an array collection of entities
      */
     private function getEntityData()
     {
+        return $this->entityData;
+    }
+
+    /**
+     * LifeCycleCallback PostLoad, loading entities from DataBase.
+     *
+     * @ORM\PostLoad
+     *
+     * @param LifecycleEventArgs $event
+     */
+    public function loadEntitiesAtLoad(LifecycleEventArgs $event)
+    {
         if ($this->entityValue && $this->entityValue['entityClass']) {
-            // TODO: find a better way to retrieve the entity manager
-            global $kernel;
-            $em = $kernel->getContainer()->get('doctrine')->getManager();
+            $em = $event->getEntityManager();
             if (is_array($this->entityValue) && is_array($this->entityValue['entityId'])) {
                 // multiple
                 $entityData = $em->getRepository($this->entityValue['entityClass'])->findById($this->entityValue['entityId']); // in this case, $this->entityValue['entityId'] contains an array of entity IDs
@@ -154,9 +167,9 @@ class EntityCustomField extends CustomFieldBase
                 $entityData = $em->getRepository($this->entityValue['entityClass'])->findOneById($this->entityValue['entityId']);
             }
 
-            return $entityData;
+            $this->entityData = $entityData;
         } else {
-            return null;
+            $this->entityData = null;
         }
     }
 
