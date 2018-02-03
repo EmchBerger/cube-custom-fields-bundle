@@ -31,7 +31,7 @@ class CustomFieldsFormServiceTest extends TestCase
         $form = $this->getMockForm();
         $form->expects($this->never())->method('add');
 
-        $this->setExpectedException(\LogicException::class);
+        $this->expectException(\LogicException::class);
         $service->addCustomFields($form);
     }
 
@@ -41,7 +41,7 @@ class CustomFieldsFormServiceTest extends TestCase
         $form = $this->getMockForm('EntityClass1');
         $form->expects($this->never())->method('add');
 
-        $this->setExpectedException(\LogicException::class);
+        $this->expectException(\LogicException::class);
         $service->addCustomFields($form, 'EntityClass2');
     }
 
