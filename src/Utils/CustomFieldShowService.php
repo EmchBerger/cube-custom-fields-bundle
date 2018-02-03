@@ -14,7 +14,7 @@ class CustomFieldShowService
         $this->configReader = $configReader;
     }
 
-    public function getDataNonempt($entity)
+    public function getDataNonempty($entity)
     {
         $fields = $entity->getNonemptyCustomFields();
         $entityClass = get_class($entity);
