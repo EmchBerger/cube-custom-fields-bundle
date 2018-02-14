@@ -102,11 +102,6 @@ class CustomFieldsGetSet
 
     public static function remove($owningEntity, $key)
     {
-        // do not save empty entities
-        /*
-         *  TODO: this does not remove CustomFieldBase entities for EntityCustomField collections!
-         *  Only the link between entity and the collection is removed (which is enough for correct functionality, but leads to dead data in the database)
-         */
         $owningEntity->getNonemptyCustomFields()->remove($key);
     }
 

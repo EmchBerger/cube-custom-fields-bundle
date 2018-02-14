@@ -136,4 +136,10 @@ trait CustomFieldsEntityTrait
     {
         $this->setCustomField($name, $value);
     }
+
+    /** @ORM\PreRemove */
+    public function removeAllRelatedCustomFields()
+    {
+        $this->getNonemptyCustomFields()->clear();
+    }
 }
