@@ -23,10 +23,16 @@ class CustomFieldsTestBase extends TestCase
         if (!$kernel || 'M' === get_class($kernel)[0]) { // kernel is not set or is Mocked class
             // create mocked container in mocked kernel for UnsavedCustomField
             $config = array(
+                'checkCorrectEntityFinding1' => array(
+                    'aDateTimeField' => array('type' => 'invalid 1'),
+                ),
                 self::MOCK_ENTITY_CLASS => array(
                     'notYetExisting' => array('type' => TextType::class),
                     'aDateTimeField' => array('type' => DateTimeType::class),
                     'someEntityType' => array('type' => EntityType::class),
+                ),
+                'checkCorrectEntityFinding2' => array(
+                    'aDateTimeField' => array('type' => 'also not valid'),
                 ),
             );
 
