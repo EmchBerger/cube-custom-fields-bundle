@@ -2,18 +2,19 @@
 
 namespace Tests\CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
-use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsCollection;
-use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\TestCase;
+use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsGetSet;
+use CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class CustomFieldsCollectionTest extends TestCase
+class CustomFieldsGetSetTest extends CustomFieldsTestBase
 {
     public function setUp()
     {
         global $kernel;
         if (!$kernel || 'M' === get_class($kernel)[0]) { // kernel is not set or is Mocked class
             // create mocked container in mocked kernel for UnsavedCustomField
-            $config = array('testGetSet' => array('notYetExisting' => array('type' => 'Symfony\Component\Form\Extension\Core\Type\TextType')));
+            $config = array(self::MOCK_ENTITY_CLASS => array('notYetExisting' => array('type' => TextType::class)));
             $mockContainer = $this->getMockBuilder('dummy\Container')
                 ->disableAutoload()
                 ->setMethods(array('getParameter'))
@@ -33,50 +34,46 @@ class CustomFieldsCollectionTest extends TestCase
 
     public function testGetSet()
     {
-        $cfac = new CustomFieldsCollection();
-        $this->assertCount(0, $cfac);
+        $entity = $this->getMockEntity();
+        $cfac = $entity->getNonemptyCustomFields();
+        $this->assertTrue($cfac instanceof Collection, 'matching class');
 
-        $newEl = $cfac['notYetExisting'];
+        $newEl = CustomFieldsGetSet::getField($entity, 'notYetExisting');
         $this->assertCount(0, $cfac, 'after getting');
+        $this->assertSame(null, $newEl);
 
-        $cfac['notYetExisting'] = $newEl;
+        CustomFieldsGetSet::setValue($entity, 'notYetExisting', null);
         $this->assertCount(0, $cfac, 'after setting nothing');
 
-        $newEl->setValue('');
-        $cfac['notYetExisting'] = $newEl;
-        $this->assertCount(0, $cfac, 'after setting ""');
-
-        $newEl->setValue('fkie1');
-        $cfac['notYetExisting'] = $newEl;
+        CustomFieldsGetSet::setValue($entity, 'notYetExisting', 'fkie1');
         $this->assertCount(1, $cfac, 'after setting string');
 
-        $getEl = $cfac['notYetExisting'];
-        $this->assertNotSame(get_class($newEl), get_class($getEl), 'real class');
-        // TODO check getEl: value, fieldId
-        $cfac['newEl'] = $getEl;
+        $getEl = CustomFieldsGetSet::getField($entity, 'notYetExisting');
+        $this->assertTrue($getEl instanceof CustomFieldBase, 'matching class');
+        $this->assertSame('fkie1', $getEl->getValue());
+
+        $getEl = CustomFieldsGetSet::setField($entity, 'newEl', $getEl);
         $this->assertCount(2, $cfac, 'after setting 2nd');
 
-        $getNewEl = $cfac['newEl'];
+        $getNewEl = CustomFieldsGetSet::getField($entity, 'newEl');
         $this->assertSame('newEl', $getNewEl->getFieldId());
         $this->assertSame('notYetExisting', $cfac['notYetExisting']->getFieldId());
 
         $getNewEl->setValue('');
-        $cfac['newEl'] = $getNewEl;
+        $getEl = CustomFieldsGetSet::setField($entity, 'newEl', $getNewEl);
         $this->assertCount(1, $cfac, 'after setting new to ""');
     }
 
     public function testCreate()
     {
-        $forTestData = new CustomFieldsCollection();
+        $forTestData = $this->getMockEntity();
         $testData = array();
-        $testData['x'] = $forTestData['x'];
-        $testData['f'] = $forTestData['f'];
+        $testData['x'] = $forTestData->notYetExisting;
 
-        $fromCol = new CustomFieldsCollection(new ArrayCollection($testData));
-        $this->assertCount(2, $fromCol, 'from ArrayCollection');
+        $this->markTestIncomplete('test more of entity');
+        $testData['f'] = $forTestData->anotherUnsetValue;
 
-        $testData['a'] = $forTestData['a']->setValue('123');
-        $fromArr = new CustomFieldsCollection($testData);
+        $forTestData->a = 123;
         $this->assertCount(3, $fromArr, 'from array');
     }
 }
