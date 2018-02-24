@@ -10,12 +10,18 @@ class CustomFieldsTestBase extends TestCase
 {
     const MOCK_ENTITY_CLASS = 'Mock_GetTestSetEntity';
 
+    public function tearDown()
+    {
+        $this->unsetTestConfig();
+    }
+
     protected function setTestConfig()
     {
         global $kernel;
         if (!$kernel || 'M' === get_class($kernel)[0]) { // kernel is not set or is Mocked class
             // create mocked container in mocked kernel for UnsavedCustomField
             $config = array(self::MOCK_ENTITY_CLASS => array('notYetExisting' => array('type' => TextType::class)));
+
             $mockContainer = $this->getMockBuilder('dummy\Container')
                 ->disableAutoload()
                 ->setMethods(array('getParameter'))
@@ -30,6 +36,19 @@ class CustomFieldsTestBase extends TestCase
                 ->method('getContainer')
                 ->will($this->returnValue($mockContainer));
             $kernel = $mockKernel;
+        }
+    }
+
+    protected function unsetTestConfig()
+    {
+        global $kernel;
+        static $mockNoKernel = null;
+
+        if ($kernel && (is_null($mockNoKernel) || $kernel instanceof $mockNoKernel)) {
+            if (is_null($mockNoKernel)) {
+                $mockNoKernel = $this->getMockBuilder('dummy\NoKernel')->disableAutoLoad()->getMock();
+            }
+            $kernel = $mockNoKernel;
         }
     }
 
