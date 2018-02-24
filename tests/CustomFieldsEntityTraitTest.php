@@ -11,14 +11,36 @@ class CustomFieldsEntityTraitTest extends EntityHelper\CustomFieldsTestBase
 
     public function testGetSetCustomFields()
     {
-        $forTestData = $this->getMockEntity();
-        $testData = array();
-        $testData['x'] = $forTestData->notYetExisting;
+        $entity = $this->getMockEntity();
+        $fields = $entity->getNonemptyCustomFields();
+        $this->assertCount(0, $fields, 'initial empty');
 
-        $this->markTestIncomplete('test more of entity');
-        $testData['f'] = $forTestData->anotherUnsetValue;
+        $unset = $entity->notYetExisting;
+        $this->assertCount(0, $fields, 'getting does not modify');
+        $this->assertNull($unset);
 
-        $forTestData->a = 123;
-        $this->assertCount(3, $fromArr, 'from array');
+        $entity->notYetExisting = 'a239zu';
+        $this->assertCount(1, $fields, 'after setting');
+        $this->assertSame('a239zu', $entity->notYetExisting, 'get same');
+
+        $entity->notYetExisting = '';
+        $this->assertCount(0, $fields, 'back to 0');
+        $this->assertNull($entity->notYetExisting);
+    }
+
+    public function testGetWrongCustomField()
+    {
+        $entity = $this->getMockEntity();
+
+        $this->expectException(\LogicException::class);
+        $entity->notExistingCustomField1;
+    }
+
+    public function testSetWrongCustomField()
+    {
+        $entity = $this->getMockEntity();
+
+        $this->expectException(\LogicException::class);
+        $entity->notExistingCustomField2 = 5;
     }
 }
