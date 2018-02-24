@@ -30,7 +30,7 @@ class EntityCustomField extends CustomFieldBase
      */
     public function setValue($value = null)
     {
-        if ($value) {
+        if ($value && !($value instanceof \Countable && 0 === count($value))) { // empty or empty collection
             // store into temporary variable
             $this->entityData = $value;
 
@@ -142,16 +142,6 @@ class EntityCustomField extends CustomFieldBase
         } else {
             return $entity;
         }
-    }
-
-    /**
-     * Returns true when the entity (its value) is empty.
-     *
-     * @return boolean
-     */
-    public function isEmpty()
-    {
-        return empty($this->getValue());
     }
 
     /**
