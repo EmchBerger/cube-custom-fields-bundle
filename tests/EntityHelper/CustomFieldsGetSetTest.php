@@ -44,17 +44,4 @@ class CustomFieldsGetSetTest extends CustomFieldsTestBase
         $getEl = CustomFieldsGetSet::setField($entity, 'newEl', $getNewEl);
         $this->assertCount(1, $cfac, 'after setting new to ""');
     }
-
-    public function testCreate()
-    {
-        $forTestData = $this->getMockEntity();
-        $testData = array();
-        $testData['x'] = $forTestData->notYetExisting;
-
-        $this->markTestIncomplete('test more of entity');
-        $testData['f'] = $forTestData->anotherUnsetValue;
-
-        $forTestData->a = 123;
-        $this->assertCount(3, $fromArr, 'from array');
-    }
 }
