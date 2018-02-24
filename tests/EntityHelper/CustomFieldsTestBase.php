@@ -4,6 +4,7 @@ namespace Tests\CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
 use CubeTools\CubeCustomFieldsBundle\CustomFieldsEntityTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -25,6 +26,7 @@ class CustomFieldsTestBase extends TestCase
                 self::MOCK_ENTITY_CLASS => array(
                     'notYetExisting' => array('type' => TextType::class),
                     'aDateTimeField' => array('type' => DateTimeType::class),
+                    'someEntityType' => array('type' => EntityType::class),
                 ),
             );
 

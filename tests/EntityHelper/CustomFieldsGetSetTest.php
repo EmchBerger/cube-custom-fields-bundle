@@ -5,6 +5,7 @@ namespace Tests\CubeTools\CubeCustomFieldsBundle\EntityHelper;
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsGetSet;
 use CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField;
 use CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 class CustomFieldsGetSetTest extends CustomFieldsTestBase
@@ -51,5 +52,10 @@ class CustomFieldsGetSetTest extends CustomFieldsTestBase
         $this->assertTrue($date instanceof \DateTimeInterface, 'matching value class');
         $elDate = CustomFieldsGetSet::getField($entity, 'aDateTimeField');
         $this->assertTrue($elDate instanceof DatetimeCustomField, 'matching class Date...');
+
+        CustomFieldsGetSet::setValue($entity, 'someEntityType', array());
+        $this->assertCount(2, $cfac, 'after setting empty array');
+        CustomFieldsGetSet::setValue($entity, 'someEntityType', new ArrayCollection());
+        $this->assertCount(2, $cfac, 'after setting empty ArrayCollection');
     }
 }
