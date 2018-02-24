@@ -3,7 +3,8 @@
 namespace Tests\CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\CustomFieldsGetSet;
-use CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase;
+use CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField;
+use CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField;
 use Doctrine\Common\Collections\Collection;
 
 class CustomFieldsGetSetTest extends CustomFieldsTestBase
@@ -30,7 +31,7 @@ class CustomFieldsGetSetTest extends CustomFieldsTestBase
         $this->assertCount(1, $cfac, 'after setting string');
 
         $getEl = CustomFieldsGetSet::getField($entity, 'notYetExisting');
-        $this->assertTrue($getEl instanceof CustomFieldBase, 'matching class');
+        $this->assertTrue($getEl instanceof TextCustomField, 'matching class Text...');
         $this->assertSame('fkie1', $getEl->getValue());
 
         $getEl = CustomFieldsGetSet::setField($entity, 'newEl', $getEl);
@@ -43,5 +44,12 @@ class CustomFieldsGetSetTest extends CustomFieldsTestBase
         $getNewEl->setValue('');
         $getEl = CustomFieldsGetSet::setField($entity, 'newEl', $getNewEl);
         $this->assertCount(1, $cfac, 'after setting new to ""');
+
+        CustomFieldsGetSet::setValue($entity, 'aDateTimeField', new \DateTimeImmutable());
+        $this->assertCount(2, $cfac, 'after setting aDateTimeField');
+        $date = CustomFieldsGetSet::getValue($entity, 'aDateTimeField');
+        $this->assertTrue($date instanceof \DateTimeInterface, 'matching value class');
+        $elDate = CustomFieldsGetSet::getField($entity, 'aDateTimeField');
+        $this->assertTrue($elDate instanceof DatetimeCustomField, 'matching class Date...');
     }
 }
