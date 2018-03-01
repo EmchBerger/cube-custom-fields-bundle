@@ -62,7 +62,7 @@ class CustomFieldsGetSet
      * @param string          $key
      * @param CustomFieldBase $entity
      */
-    public function setField($owningEntity, $key, CustomFieldBase $entity)
+    public static function setField($owningEntity, $key, CustomFieldBase $entity)
     {
         if ($entity->isEmpty()) {
             self::remove($owningEntity, $key);
@@ -85,7 +85,7 @@ class CustomFieldsGetSet
      * @param string $key
      * @param mixed  $value
      */
-    public function setValue($owningEntity, $key, $value)
+    public static function setValue($owningEntity, $key, $value)
     {
         if (!$value) {
             self::remove($owningEntity, $key);
