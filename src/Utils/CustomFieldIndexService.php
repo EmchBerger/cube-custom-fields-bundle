@@ -30,7 +30,6 @@ class CustomFieldIndexService
     public function getIndexRows(Form $filterform, $entity)
     {
         $entityClass = ClassUtils::getClass($entity);
-        dump($entityClass);
         $fieldConfig = $this->configReader->getConfigForEntity($entityClass);
         $indexRows = array();
         // iterate over filterform custom fields
