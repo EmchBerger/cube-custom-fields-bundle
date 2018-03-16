@@ -2,6 +2,7 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Form\Form;
 
 /**
@@ -28,7 +29,8 @@ class CustomFieldIndexService
      */
     public function getIndexRows(Form $filterform, $entity)
     {
-        $entityClass = get_class($entity);
+        $entityClass = ClassUtils::getClass($entity);
+        dump($entityClass);
         $fieldConfig = $this->configReader->getConfigForEntity($entityClass);
         $indexRows = array();
         // iterate over filterform custom fields
