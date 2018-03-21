@@ -31,3 +31,7 @@ services:
         autoconfigure: true
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+
+    CubeTools\CubeCustomFieldsBundle\Command\CustomFieldUpdateCommand:
+        tags:
+            - name: console.command

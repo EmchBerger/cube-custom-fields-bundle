@@ -12,12 +12,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CustomFieldUpdateCommand extends ContainerAwareCommand
 {
-    private $output; // OutputInterface
+    protected static $defaultName = 'cube:customfield:update';
 
     protected function configure()
     {
         $this
-            ->setName('cube:customfield:update')
+            // self::$defaultName instead of ->setName()
             ->setDescription('Updates the string representation of the custom fields table entries.')
         ;
     }
