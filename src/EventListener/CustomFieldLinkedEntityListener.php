@@ -4,6 +4,7 @@ namespace CubeTools\CubeCustomFieldsBundle\EventListener;
 use CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader;
 use CubeTools\CubeCustomFieldsBundle\Utils\CustomFieldRepoService;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\Common\Util\ClassUtils;
 
 class CustomFieldLinkedEntityListener
 {
@@ -29,7 +30,7 @@ class CustomFieldLinkedEntityListener
                     foreach ($affectedCustomFields as $cf) {
                         $cf->storeStrRepresentationOnFlush($entity);
                         $em->persist($cf);
-                        $cfMetadata = $em->getClassMetadata(get_class($cf));
+                        $cfMetadata = $em->getClassMetadata(ClassUtils::getClass($cf));
                         $uow->computeChangeSet($cfMetadata, $cf);
                     }
                 }

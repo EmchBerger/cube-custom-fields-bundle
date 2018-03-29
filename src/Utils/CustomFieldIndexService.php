@@ -2,6 +2,7 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Form\Form;
 
 /**
@@ -28,7 +29,7 @@ class CustomFieldIndexService
      */
     public function getIndexRows(Form $filterform, $entity)
     {
-        $entityClass = get_class($entity);
+        $entityClass = ClassUtils::getClass($entity);
         $fieldConfig = $this->configReader->getConfigForEntity($entityClass);
         $indexRows = array();
         // iterate over filterform custom fields
@@ -38,7 +39,7 @@ class CustomFieldIndexService
                 // we can access the customField directly by its name (using the magic getter function in the custom field trait):
                 $value = $entity->$fieldGetter;
                 $raw = false;
-                if ($fieldConfig[$fieldGetter]['type'] == 'Ivory\CKEditorBundle\Form\Type\CKEditorType') {
+                if (array_key_exists($fieldGetter, $fieldConfig) && $fieldConfig[$fieldGetter]['type'] == 'Ivory\CKEditorBundle\Form\Type\CKEditorType') {
                     $raw = true;
                 }
                 if (is_object($value) && $value instanceof \DateTimeInterface) {
