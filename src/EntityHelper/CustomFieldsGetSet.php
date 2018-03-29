@@ -4,6 +4,7 @@ namespace CubeTools\CubeCustomFieldsBundle\EntityHelper;
 
 use CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * Handles a collection for CustomFieldBase entities.
@@ -136,7 +137,7 @@ class CustomFieldsGetSet
     private static function getEntityType($owningEntity, $key)
     {
         $config = self::getConfig();
-        $owningClass = get_class($owningEntity);
+        $owningClass = ClassUtils::getClass($owningEntity);
         if (isset($config[$owningClass][$key])) {
             return $config[$owningClass][$key]['type'];
         }
@@ -155,7 +156,7 @@ class CustomFieldsGetSet
     private static function checkCustomFieldExists($owningEntity, $key)
     {
         if (is_null(self::getEntityType($owningEntity, $key))) {
-            $msg = sprintf('CustomField "%s" does not exist for entity class "%s"', $key, get_class($owningEntity));
+            $msg = sprintf('CustomField "%s" does not exist for entity class "%s"', $key, ClassUtils::getClass($owningEntity));
             throw new \LogicException($msg);
         }
     }
