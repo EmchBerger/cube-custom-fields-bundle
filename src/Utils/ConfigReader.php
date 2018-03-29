@@ -25,8 +25,27 @@ class ConfigReader
         return array();
     }
 
+    public function getConfigForEntitesField($entity, $fieldId)
+    {
+        if (is_object($entity)) {
+            $entity = get_class($entity);
+        }
+
+        $entityConfig = $this->getConfigForEntity($entity);
+        $config = array();
+        if (isset($entityConfig[$fieldId])) {
+            $config = $entityConfig[$fieldId];
+        }
+
+        return $config;
+    }
+
+    /**
+     * @deprecated since version 1.3.6, use {@see getConfigForEntitesField}
+     */
     public function getConfigForFieldId($fieldId)
     {
+        @trigger_error(__METHOD__.' is deprecated, use getConfigForEntitesField() instead');
         foreach ($this->config as $entityConfig) {
             if (array_key_exists($fieldId, $entityConfig)) {
                 return $entityConfig[$fieldId];

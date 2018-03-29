@@ -5,6 +5,7 @@ namespace CubeTools\CubeCustomFieldsBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @ORM\Entity
@@ -30,7 +31,7 @@ class EntityCustomField extends CustomFieldBase
      */
     public function setValue($value = null)
     {
-        if ($value) {
+        if ($value && !($value instanceof \Countable && 0 === count($value))) { // empty or empty collection
             // store into temporary variable
             $this->entityData = $value;
 
@@ -41,12 +42,12 @@ class EntityCustomField extends CustomFieldBase
                 $saveClass = null;
                 foreach ($value as $val) {
                     $saveValue[] = $val->getId();
-                    $saveClass = get_class($val); // only the last class type is stored. We assume that it's the same anyway
+                    $saveClass = ClassUtils::getClass($val); // only the last class type is stored. We assume that it's the same anyway
                 }
             } else {
                 // this is the case if multiple = false
                 $saveValue = $value->getId();
-                $saveClass = get_class($value);
+                $saveClass = ClassUtils::getClass($value);
             }
             if ($saveClass) {
                 $this->entityValue = array(
@@ -137,21 +138,11 @@ class EntityCustomField extends CustomFieldBase
      */
     private function getEntityOnFlush($entity, $flushEntity)
     {
-        if (get_class($entity) == get_class($flushEntity) && $entity->getId() === $flushEntity->getId()) {
+        if (ClassUtils::getClass($entity) == ClassUtils::getClass($flushEntity) && $entity->getId() === $flushEntity->getId()) {
             return $flushEntity;
         } else {
             return $entity;
         }
-    }
-
-    /**
-     * Returns true when the entity (its value) is empty.
-     *
-     * @return boolean
-     */
-    public function isEmpty()
-    {
-        return empty($this->getValue());
     }
 
     /**
