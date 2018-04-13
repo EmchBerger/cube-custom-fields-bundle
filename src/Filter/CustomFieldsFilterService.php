@@ -45,23 +45,11 @@ class CustomFieldsFilterService
                 }
                 if (count($cfArr)) {
                     // we found some relevant customField entities
-                    // now we want to retrieve all entities which are linked with at least one of the customFields
-                    $inArrClause = array();
-                    foreach ($cfArr as $cf) {
-                        $relevantEntitiesIds = $this->repo->getEntitiesIdsForCustomFieldId($entityClass, $cf);
-                        if (count($relevantEntitiesIds)) {
-                            $inArrClause[] = $firstRootAlias.'.id IN ('.implode(',', $relevantEntitiesIds).')';
-                        }
-                    }
-                    if (count($inArrClause)) {
-                        $qb->andWhere(implode(' OR ', $inArrClause));
-                    } else {
-                        // no entity linked with the relevant customFields
-                        $qb->andWhere("TRUE = FALSE");
-                    }
+                    // now we want to retrieve all entities which are linked with at least one of the found customFields (if any; otherwise, nothing shall be returned)
+                    $this->repo->addWhereInIdsForCustomFieldIds($qb, $firstRootAlias . '.id', $entityClass, $cfArr);
                 } else {
-                    // no custom field contains the requested value. Therefore, no entry can satisfy the filter criteria and we can directly skip all further fields.
-                    $qb->andWhere("TRUE = FALSE");
+                    // no configField found or no entities matching the config field, so there's no need to continue
+                    $qb->andWhere('TRUE = FALSE');
                     break;
                 }
             }
