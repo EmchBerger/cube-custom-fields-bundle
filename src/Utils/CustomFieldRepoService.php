@@ -83,7 +83,7 @@ class CustomFieldRepoService
 
     private function getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)
     {
-        $alias = md5($entityClass . implode('_', $customFieldIds)) . mt_rand(0, 100); // make sure the alias is unique in the whole surrounding query (if any)
+        $alias = 'entity_' . implode('', $customFieldIds) . mt_rand(0, 1000); //md5($entityClass . implode('_', $customFieldIds)); // make sure the alias is unique in the whole surrounding query (if any)
         $cfAlias = $alias . '_cf';
         $qb = $this->mr->getManager()->getRepository($entityClass)->createQueryBuilder($alias);
         $qb->join($alias . '.customFields', $cfAlias)
