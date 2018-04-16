@@ -59,20 +59,25 @@ class CustomFieldIndexService
      * Retrieves the header data of the custom fields for a given form fields set (filterform)
      * Values are returned together with a raw parameter (boolean) indicating whether the raw filter should be applied during print out
      *
-     * @param Form $filterform    Filter form containing all form fields which shall be available for filtering.
+     * @param Form $filterform  Filter form containing all form fields which shall be available for filtering.
+     * @param array $options    array containing additional option/value pairs which should be passed on to the header elements (e.g. for styling)
      *
      * @return array            Contains the header data of all custom fields which are referenced in the entity for all types contained in filterform
      */
-    public function getHeader(Form $filterform)
+    public function getHeader(Form $filterform, $options = array())
     {
         $header = array();
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
-                $header[] = array(
+                $headerElem = array(
                     'name' => $filterfield->getName(),
                     'class' => $filterfield->getName() . 'Col',
                     'label'=> $filterfield->getConfig()->getOption('label'),
                 );
+                foreach ($options as $optionKey => $option) {
+                    $headerElem[$optionKey] = $option;
+                }
+                $header[] = $headerElem;
             }
         }
 
