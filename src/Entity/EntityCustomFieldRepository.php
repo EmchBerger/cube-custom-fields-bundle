@@ -26,7 +26,7 @@ class EntityCustomFieldRepository extends EntityRepository
     public function addFindByObject($qb, $cfAlias, $object, $fieldId)
     {
         $objectClass = str_replace('\\', '\\\\\\\\', ClassUtils::getClass($object));
-        $objectId = $object->getId();
+        $objectId = intval($object->getId());
         /*
          * Structure of the entityValue field.
          * 
