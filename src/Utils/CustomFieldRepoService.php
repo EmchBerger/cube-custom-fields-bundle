@@ -26,7 +26,7 @@ class CustomFieldRepoService
      * @param string $entityClass   Must be an entity stored in the database
      * @param int    $customFieldId The ID of the customField base entity to match with
      *
-     * @return array        Contains all found customField entities, which point to $object
+     * @return array        Contains all found entity IDs which point to the customFieldId
      */
     public function getEntitiesIdsForCustomFieldId($entityClass, $customFieldId)
     {
@@ -41,6 +41,59 @@ class CustomFieldRepoService
     }
 
     /**
+     * Retrieves all entities from a given class which are linked to a set of CustomField
+     *
+     * @param string $entityClass   Must be an entity stored in the database
+     * @param array  $customFieldIds The array of IDs of the customField base entities to match with
+     *
+     * @return array Contains all found entity IDs which point to any of the customFields in customFieldIds
+     */
+    public function getEntitiesIdsForCustomFieldIds($entityClass, $customFieldIds)
+    {
+        if (!count($customFieldIds)) {
+            return array();
+        }
+
+        $qb = $this->getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds);
+
+        $result = $qb->getQuery()->getScalarResult();
+
+        return array_column($result, 'id');
+    }
+
+    /**
+     * Add an IN-criterion to an existing querybuilder to only allow queryField to be in set of entities referring to given customFields
+     * @param DoctrineQueryBuilder $qb
+     * @param string $queryField
+     * @param string $entityClass
+     * @param array $customFieldIds
+     *
+     * @return DoctrineQueryBuilder $qb
+     */
+    public function addWhereInIdsForCustomFieldIds($qb, $queryField, $entityClass, $customFieldIds)
+    {
+        if (!count($customFieldIds)) {
+            $qb->andWhere('TRUE = FALSE');
+        } else {
+            $qb->andWhere($qb->expr()->in($queryField, $this->getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)->getDQL()));
+        }
+
+        return $qb;
+    }
+
+    private function getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)
+    {
+        $alias = 'entity_' . implode('', $customFieldIds) . mt_rand(0, 1000); //md5($entityClass . implode('_', $customFieldIds)); // make sure the alias is unique in the whole surrounding query (if any)
+        $cfAlias = $alias . '_cf';
+        $qb = $this->mr->getManager()->getRepository($entityClass)->createQueryBuilder($alias);
+        $qb->join($alias . '.customFields', $cfAlias)
+           ->select($alias . '.id')
+           ->where($cfAlias . '.id IN (' . implode(',', $customFieldIds) . ')');
+
+        return $qb;
+    }
+
+    /**
      * Retrieves all customField entities IDs (with fieldId = $fieldId) which point to $object
      *
      * @param int    $fieldId The identifier of the customField to search through
@@ -50,11 +103,8 @@ class CustomFieldRepoService
      */
     public function getCustomFieldEntitiesIdsForObject($fieldId, $object)
     {
-        $entities = $this->getCustomFieldEntitiesForObject($fieldId, $object);
-        $ids = array();
-        foreach ($entities as $entity) {
-            $ids[] = $entity->getId();
-        }
+        $customFields = $this->getCustomFieldEntitiesForObject($fieldId, $object, true);
+        $ids = array_column($customFields, "id");
 
         return $ids;
     }
@@ -67,7 +117,7 @@ class CustomFieldRepoService
      *
      * @return array        Contains all found customField entities, which point to $object
      */
-    public function getCustomFieldEntitiesForObject($fieldId, $object)
+    public function getCustomFieldEntitiesForObject($fieldId, $object, $idsOnly = false)
     {
         if (!($fieldId && $object)) {
             // if either of the two parameters is not set, we can skip the rest
@@ -93,45 +143,28 @@ class CustomFieldRepoService
         }
 
         // retrieve the customField entities from the database
+        $qb = $er->createQueryBuilder('cf');
         if ($simpleQuery) {
+            // "simple" custom field entity types
             $dbField = $entityClass::getStorageFieldName();
-            $containingCustomFields = $er->createQueryBuilder('cf')
-                    ->andWhere('cf.fieldId = :fieldId')
-                    ->andWhere('cf.'.$dbField.' LIKE :object')
-                    ->setParameters(array(
-                        'fieldId' => $fieldId,
-                        'object' => '%'.$object.'%',
-                    ))->getQuery()->getResult()
-            ;
+            $qb->andWhere('cf.fieldId = :fieldId')
+                ->andWhere('cf.'.$dbField.' LIKE :object')
+                ->setParameters(array(
+                    'fieldId' => $fieldId,
+                    'object' => '%'.$object.'%',
+                ));
         } else {
-            $customFieldEntities = $er->findBy(array('fieldId' => $fieldId));
-            // traverse the customField entities and check if the $object is contained
-            $containingCustomFields = array();
-            foreach ($customFieldEntities as $cfEntity) {
-                if ($cfEntity->isEmpty()) {
-                    // empty values can occur if the cleanup of empty custom fields is not correctly done
-                    continue;
-                }
-                $cfEntityVal = $cfEntity->getValue();
-                if (is_array($cfEntityVal) || $cfEntityVal instanceof \ArrayAccess) {
-                    // the customField contains an array of entities
-                    foreach ($cfEntityVal as $content) {
-                        // we filter by an object
-                        if ($content && self::compareObjects($object, $content)) {
-                            $containingCustomFields[] = $cfEntity;
-                            break;
-                        }
-                    }
-                } else {
-                    // the customField contains a single entity
-                    if (self::compareObjects($object, $cfEntityVal)) {
-                        $containingCustomFields[] = $cfEntity;
-                    }
-                }
-            }
+            // EntityCustomField
+            $er->addFindByObject($qb, 'cf', $object, $fieldId);
+        }
+        if ($idsOnly) {
+            $qb->select('cf.id');
+            $returnVal = $qb->getQuery()->getScalarResult();
+        } else {
+            $returnVal = $qb->getQuery()->getResult();
         }
 
-        return $containingCustomFields;
+        return $returnVal;
     }
 
     /**

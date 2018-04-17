@@ -8,7 +8,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\Common\Util\ClassUtils;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomFieldRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class EntityCustomField extends CustomFieldBase
