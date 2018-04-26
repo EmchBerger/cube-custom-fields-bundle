@@ -14,6 +14,11 @@ use Doctrine\ORM\Mapping as ORM;
 trait CustomFieldsEntityTrait
 {
     /**
+     * @var array custom fields, which were changed
+     */
+    protected $changedCustomFields = array();
+
+    /**
      * Custom fields linked to this entity.
      *
      * @var ArrayCollection of CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase
@@ -106,9 +111,21 @@ trait CustomFieldsEntityTrait
 
     public function setCustomField($fieldId, $value)
     {
+        $oldValue = CustomFieldsGetSet::getValue($this, $fieldId);
+        if (!((is_array($value) && is_array($oldValue) && count(array_diff($oldValue, $value)) === 0) ||
+            $oldValue == $value)) {
+            // field was changed
+            $this->changedCustomFields[] = $fieldId;
+        }
+
         CustomFieldsGetSet::setValue($this, $fieldId, $value);
     }
 
+    public function getChangedCustomFields()
+    {
+        return $this->changedCustomFields;
+    }
+ 
     public function getCustomField($fieldId)
     {
         return CustomFieldsGetSet::getValue($this, $fieldId);
