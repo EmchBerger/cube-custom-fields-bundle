@@ -113,7 +113,7 @@ trait CustomFieldsEntityTrait
     {
         $oldValue = CustomFieldsGetSet::getValue($this, $fieldId);
         if (!((is_array($value) && is_array($oldValue) && count(array_diff($oldValue, $value)) === 0) ||
-            $oldValue == $value)) {
+            $oldValue === $value)) {
             // field was changed
             $this->changedCustomFields[] = $fieldId;
         }
