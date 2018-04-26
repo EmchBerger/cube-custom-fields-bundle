@@ -112,12 +112,18 @@ trait CustomFieldsEntityTrait
     public function setCustomField($fieldId, $value)
     {
         $oldValue = CustomFieldsGetSet::getValue($this, $fieldId);
-        if (!((is_array($value) && is_array($oldValue) && count(array_diff($oldValue, $value)) === 0) ||
-            $oldValue === $value)) {
+        if (!(
+                (is_array($value) && is_array($oldValue) && count($value) == count($oldValue) && count(array_diff($oldValue, $value)) == 0 && count(array_diff($value, $oldValue)) == 0) // array-value with identical content
+                || $oldValue === $value // non-array-value with identical content
+                || ($oldValue === null && ( // custom field not set yet (null)
+                        (is_array($value) && count($value) == 0) // new value is empty array
+                        || (is_string($value) && $value == '') // new value is empty string
+                        // note: we do not add $value === false as a check here, since setting "false" may not have the same meaning as null.
+                    ))
+            )) {
             // field was changed
             $this->changedCustomFields[] = $fieldId;
         }
-
         CustomFieldsGetSet::setValue($this, $fieldId, $value);
     }
 
