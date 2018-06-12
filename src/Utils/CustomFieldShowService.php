@@ -60,7 +60,7 @@ class CustomFieldShowService
         } else {
             $showCfg['value'] = array($value);
         }
-        $showCfg['raw'] = ($fieldConfig['type'] == "Ivory\CKEditorBundle\Form\Type\CKEditorType");
+        $showCfg['raw'] = ($fieldConfig['type'] == "FOS\CKEditorBundle\Form\Type\CKEditorType");
 
         return $showCfg;
     }

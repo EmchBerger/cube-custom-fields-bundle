@@ -39,7 +39,7 @@ class CustomFieldIndexService
                 // we can access the customField directly by its name (using the magic getter function in the custom field trait):
                 $value = $entity->$fieldGetter;
                 $raw = false;
-                if (array_key_exists($fieldGetter, $fieldConfig) && $fieldConfig[$fieldGetter]['type'] == 'Ivory\CKEditorBundle\Form\Type\CKEditorType') {
+                if (array_key_exists($fieldGetter, $fieldConfig) && $fieldConfig[$fieldGetter]['type'] == 'FOS\CKEditorBundle\Form\Type\CKEditorType') {
                     $raw = true;
                 }
                 if (is_object($value) && $value instanceof \DateTimeInterface) {
