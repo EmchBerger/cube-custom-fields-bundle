@@ -17,7 +17,12 @@ class CustomFieldsFilterService
         $this->repo = $repo;
     }
 
-    public function applyFilter($filterform, QueryBuilder $qb, $firstRootAlias = null)
+    /**
+     * @param \CubeTools\CubeCommonBundle\Form\Type\AbstractFilterType $filterform
+     * @param \Doctrine\ORM\QueryBuilder|\CubeTools\CubeCommonBundle\Filter\FilterEntityQueryBuilder $qb doctrine query builder or object emulating query builder
+     * @param string $firstRootAlias
+     */
+    public function applyFilter($filterform, $qb, $firstRootAlias = null)
     {
         if (!$firstRootAlias) {
                 $firstRootAlias = $qb->getRootAliases()[0];
