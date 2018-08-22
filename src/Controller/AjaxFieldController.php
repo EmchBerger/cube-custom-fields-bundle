@@ -106,6 +106,19 @@ class AjaxFieldController extends Controller
             );
         }
 
+        if ($request->query->get('any_none') && $page == 1) {
+            $anyNone = $request->query->get('any_none');
+            $anyNoneElements = explode(',', $anyNone);
+
+            foreach ($anyNoneElements as $anyNoneElement) {
+                $anyNoneElementParts = explode(':', $anyNoneElement);
+                $entities[] = array(
+                    'id' => $anyNoneElementParts[0],
+                    'text' => $anyNoneElementParts[1]
+                );
+            }
+        }
+
         return new JsonResponse(array(
             'results' => $entities,
             'more' => $more,
