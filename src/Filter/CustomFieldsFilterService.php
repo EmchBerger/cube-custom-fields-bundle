@@ -35,15 +35,39 @@ class CustomFieldsFilterService
                 $filterVal = $filterfield->getData();
                 $filterName = $filterfield->getName();
 
-                $anyNoneSelectedColumns = json_decode($filterform->get('anyNoneSelectedColumns')->getData());
-                if (in_array($filterName, $anyNoneSelectedColumns->any)) {
-                    $this->repo->addAnyCustomFieldId($filterName, $firstRootAlias, $qb);
+                $filterfieldAttr = $filterfield->getConfig()->getOption('attr');
+                $anyText = false;
+                $noneText = false;
+                if (isset($filterfieldAttr['any_none'])) {
+                    $anyNoneElements = explode(',', $filterfieldAttr['any_none']);
+
+                    foreach ($anyNoneElements as $anyNoneElement) {
+                        $anyNoneElementParts = explode(':', $anyNoneElement);
+                        if ($anyNoneElementParts[0] === 'any') {
+                            $anyText = $anyNoneElementParts[1];
+                        }
+                        if ($anyNoneElementParts[0] === 'none') {
+                            $noneText = $anyNoneElementParts[1];
+                        }
+                    }
                 }
-                if (in_array($filterName, $anyNoneSelectedColumns->none)) {
-                    $this->repo->addNoneCustomFieldId($filterName, $firstRootAlias, $qb);
+                $anyNoneUsed = false;
+                if ($filterform->has('anyNoneSelectedColumns')) {
+                    $anyNoneSelectedColumns = json_decode($filterform->get('anyNoneSelectedColumns')->getData());
+                } else {
+                    $anyNoneSelectedColumns = false;
                 }
 
-                if (!$filterVal || !count($filterVal)) {
+                if ((isset($anyNoneSelectedColumns->any) && in_array($filterName, $anyNoneSelectedColumns->any)) || $filterVal === $anyText) {
+                    $this->repo->addAnyCustomFieldId($filterName, $firstRootAlias, $qb);
+                    $anyNoneUsed = true;
+                }
+                if ((isset($anyNoneSelectedColumns->none) && in_array($filterName, $anyNoneSelectedColumns->none)) || $filterVal === $noneText) {
+                    $this->repo->addNoneCustomFieldId($filterName, $firstRootAlias, $qb);
+                    $anyNoneUsed = true;
+                }
+
+                if (!$filterVal || !count($filterVal) || $anyNoneUsed) {
                     // we are not interested in empty filters
                     continue;
                 }

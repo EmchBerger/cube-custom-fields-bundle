@@ -40,18 +40,20 @@ class CustomFieldRepoService
         return array_column($result, 'id');
     }
 
-    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb, $noneQuery = false)
     {
-        $qb->join($firstRootAlias . '.customFields', 'cf')
-           ->andWhere('cf.fieldId = :fieldId')
-           ->setParameter('fieldId', $customFieldId);
+        if (!in_array('cf', $qb->getAllAliases())) {
+            $qb->join($firstRootAlias . '.customFields', 'cf');
+        }
+        $qb->andWhere('cf.fieldId = :fieldId')
+            ->setParameter('fieldId', $customFieldId);
 
         return $qb;
     }
 
     public function addNoneCustomFieldId($customFieldId, $firstRootAlias, $qb)
     {
-        $qbAny = $this->addAnyCustomFieldId($customFieldId, $firstRootAlias, clone $qb);
+        $qbAny = $this->addAnyCustomFieldId($customFieldId, $firstRootAlias, clone $qb, true);
         $qb->andWhere($firstRootAlias . '.id NOT IN (:any)')
            ->setParameter('any', $qbAny->getQuery()->getResult());
 
