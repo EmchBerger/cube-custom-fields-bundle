@@ -67,7 +67,7 @@ class CustomFieldsFilterService
                     $anyNoneUsed = true;
                 }
 
-                if (!$filterVal || !count($filterVal) || $anyNoneUsed) {
+                if (!$filterVal || ($filterVal instanceof \Countable) && !count($filterVal) || $anyNoneUsed) {
                     // we are not interested in empty filters
                     continue;
                 }
