@@ -33,11 +33,21 @@ class CustomFieldsFilterService
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
                 $filterVal = $filterfield->getData();
+                $filterName = $filterfield->getName();
+
+                $anyNoneSelectedColumns = json_decode($filterform->get('anyNoneSelectedColumns')->getData());
+                if (in_array($filterName, $anyNoneSelectedColumns->any)) {
+                    $this->repo->addAnyCustomFieldId($filterName, $firstRootAlias, $qb);
+                }
+                if (in_array($filterName, $anyNoneSelectedColumns->none)) {
+                    $this->repo->addNoneCustomFieldId($filterName, $firstRootAlias, $qb);
+                }
+
                 if (!$filterVal || !count($filterVal)) {
                     // we are not interested in empty filters
                     continue;
                 }
-                $filterName = $filterfield->getName();
+
                 $cfArr = array(); // the array which will contain the customField IDs to be filtered for
                 if (is_array($filterVal) || $filterVal instanceof \ArrayAccess) {
                     // multi select filter field

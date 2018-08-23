@@ -40,6 +40,24 @@ class CustomFieldRepoService
         return array_column($result, 'id');
     }
 
+    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    {
+        $qb->join($firstRootAlias . '.customFields', 'cf')
+           ->andWhere('cf.fieldId = :fieldId')
+           ->setParameter('fieldId', $customFieldId);
+
+        return $qb;
+    }
+
+    public function addNoneCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    {
+        $qbAny = $this->addAnyCustomFieldId($customFieldId, $firstRootAlias, clone $qb);
+        $qb->andWhere($firstRootAlias . '.id NOT IN (:any)')
+           ->setParameter('any', $qbAny->getQuery()->getResult());
+
+        return $qb;
+    }
+
     /**
      * Retrieves all entities from a given class which are linked to a set of CustomField
      *
