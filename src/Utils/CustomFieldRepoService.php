@@ -14,6 +14,11 @@ class CustomFieldRepoService
     private $configReader;
     private $mr;
 
+    /**
+     * @var int number of usages of parameter (preventing overwrite of previous value)
+     */
+    protected $parameterCount = 0;
+
     public function __construct(ConfigReader $configReader, ManagerRegistry $mr)
     {
         $this->configReader = $configReader;
@@ -40,22 +45,28 @@ class CustomFieldRepoService
         return array_column($result, 'id');
     }
 
-    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb, $noneQuery = false)
+    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
     {
+        $qbCloned = clone $qb;
+
         if (!in_array('cf', $qb->getAllAliases())) {
-            $qb->join($firstRootAlias . '.customFields', 'cf');
+            $qbCloned->join($firstRootAlias . '.customFields', 'cf');
         }
-        $qb->andWhere('cf.fieldId = :fieldId')
+        $qbCloned->andWhere('cf.fieldId = :fieldId')
             ->setParameter('fieldId', $customFieldId);
+        $qb->andWhere($firstRootAlias . sprintf('.id IN (:any%s)', $this->parameterCount))
+            ->setParameter('any' . $this->parameterCount, $qbCloned->getQuery()->getResult());
+        $this->parameterCount++;
 
         return $qb;
     }
 
     public function addNoneCustomFieldId($customFieldId, $firstRootAlias, $qb)
     {
-        $qbAny = $this->addAnyCustomFieldId($customFieldId, $firstRootAlias, clone $qb, true);
-        $qb->andWhere($firstRootAlias . '.id NOT IN (:any)')
-           ->setParameter('any', $qbAny->getQuery()->getResult());
+        $qbAny = $this->addAnyCustomFieldId($customFieldId, $firstRootAlias, clone $qb);
+        $qb->andWhere($firstRootAlias . sprintf('.id NOT IN (:notAny%s)', $this->parameterCount))
+            ->setParameter('notAny' . $this->parameterCount, $qbAny->getQuery()->getResult());
+        $this->parameterCount++;
 
         return $qb;
     }
