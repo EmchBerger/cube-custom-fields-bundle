@@ -45,27 +45,58 @@ class CustomFieldRepoService
         return array_column($result, 'id');
     }
 
-    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    /**
+     * @param string $customFieldId
+     * @param string $firstRootAlias
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     *
+     * @return array id of entities, which fulfil any condition
+     */
+    protected function addAnyCustomFieldIdQueryResult($customFieldId, $firstRootAlias, $qb)
     {
         $qbCloned = clone $qb;
-
         if (!in_array('cf', $qb->getAllAliases())) {
             $qbCloned->join($firstRootAlias . '.customFields', 'cf');
         }
         $qbCloned->andWhere('cf.fieldId = :fieldId')
             ->setParameter('fieldId', $customFieldId);
+
+        return $qbCloned->getQuery()->getResult();
+    }
+
+    /**
+     * Method looking for records, where any value of custom field is set.
+     *
+     * @param string $customFieldId
+     * @param string $firstRootAlias
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    {
+        $entities = $this->addAnyCustomFieldIdQueryResult($customFieldId, $firstRootAlias, $qb);
         $qb->andWhere($firstRootAlias . sprintf('.id IN (:any%s)', $this->parameterCount))
-            ->setParameter('any' . $this->parameterCount, $qbCloned->getQuery()->getResult());
+            ->setParameter('any' . $this->parameterCount, $entities);
         $this->parameterCount++;
 
         return $qb;
     }
 
+    /**
+     * Method looking for records, where no value of custom field is set.
+     *
+     * @param string $customFieldId
+     * @param string $firstRootAlias
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
     public function addNoneCustomFieldId($customFieldId, $firstRootAlias, $qb)
     {
-        $qbAny = $this->addAnyCustomFieldId($customFieldId, $firstRootAlias, clone $qb);
+        $entities = $this->addAnyCustomFieldIdQueryResult($customFieldId, $firstRootAlias, $qb);
         $qb->andWhere($firstRootAlias . sprintf('.id NOT IN (:notAny%s)', $this->parameterCount))
-            ->setParameter('notAny' . $this->parameterCount, $qbAny->getQuery()->getResult());
+            ->setParameter('notAny' . $this->parameterCount, $entities);
         $this->parameterCount++;
 
         return $qb;
