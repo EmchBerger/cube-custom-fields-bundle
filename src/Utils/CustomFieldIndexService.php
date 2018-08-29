@@ -69,14 +69,14 @@ class CustomFieldIndexService
         $header = array();
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
-                $headerElem = array(
-                    'name' => $filterfield->getName(),
-                    'class' => $filterfield->getName() . 'Col',
-                    'label'=> $filterfield->getConfig()->getOption('label'),
-                );
+                $headerElem = array('name', 'class', 'label');
                 foreach ($options as $optionKey => $option) {
                     $headerElem[$optionKey] = $option;
                 }
+                $headerElem['name'] = $filterfield->getName();
+                $headerElem['class'] = $filterfield->getName().'Col';
+                $headerElem['label'] = $filterfield->getConfig()->getOption('label');
+
                 $header[] = $headerElem;
             }
         }
