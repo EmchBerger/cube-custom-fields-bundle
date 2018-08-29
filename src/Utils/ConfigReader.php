@@ -18,6 +18,20 @@ class ConfigReader
     }
 
     /**
+     * Returns the real class of the entity.
+     *
+     * Proxy classes are resolved to the real entity class. Convinient for {@see ClassUtils::getClass()}
+     *
+     * @param object $entity object to get the class for
+     *
+     * @return string class of entity
+     */
+    public static function getEntityClass($entity)
+    {
+        return ClassUtils::getClass($entity);
+    }
+
+    /**
      * Returns the custom field config for the given entity
      *
      * @param object|string entity or class of entity
@@ -27,7 +41,7 @@ class ConfigReader
     public function getConfigForEntity($entity)
     {
         if (is_object($entity)) {
-            $entityClass = ClassUtils::getClass($entity);
+            $entityClass = self::getEntityClass($entity);
         } else {
             $entityClass = $entity;
         }
