@@ -12,6 +12,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 class CustomFieldsFilterService
 {
+    private $repo;
+
     public function __construct(CustomFieldRepoService $repo)
     {
         $this->repo = $repo;
