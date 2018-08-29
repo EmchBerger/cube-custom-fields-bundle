@@ -3,6 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * This service class allows access to the bundle configuration (custom_fields.yml)
@@ -16,8 +17,20 @@ class ConfigReader
         $this->config = $config;
     }
 
-    public function getConfigForEntity($entityClass)
+    /**
+     * Returns the custom field config for the given entity
+     *
+     * @param object|string entity or class of entity
+     *
+     * @return array config of entity
+     */
+    public function getConfigForEntity($entity)
     {
+        if (is_object($entity)) {
+            $entityClass = ClassUtils::getClass($entity);
+        } else {
+            $entityClass = $entity;
+        }
         if (array_key_exists($entityClass, $this->config)) {
             return $this->config[$entityClass];
         }
@@ -27,10 +40,6 @@ class ConfigReader
 
     public function getConfigForEntitesField($entity, $fieldId)
     {
-        if (is_object($entity)) {
-            $entity = get_class($entity);
-        }
-
         $entityConfig = $this->getConfigForEntity($entity);
         $config = array();
         if (isset($entityConfig[$fieldId])) {
