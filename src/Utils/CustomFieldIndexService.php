@@ -42,9 +42,6 @@ class CustomFieldIndexService
                 if (array_key_exists($fieldGetter, $fieldConfig) && $fieldConfig[$fieldGetter]['type'] == 'FOS\CKEditorBundle\Form\Type\CKEditorType') {
                     $raw = true;
                 }
-                if (is_object($value) && $value instanceof \DateTimeInterface) {
-                    $value = $value->format('d.m.Y');
-                }
                 $indexRows[] = array(
                     'value' => $value,
                     'raw' => $raw,
