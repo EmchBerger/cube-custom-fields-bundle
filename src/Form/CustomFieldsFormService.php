@@ -6,7 +6,7 @@ use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Forminterface;
+use Symfony\Component\Form\FormInterface;
 
 class CustomFieldsFormService
 {
@@ -36,14 +36,14 @@ class CustomFieldsFormService
      */
     public function addCustomFields($form, $dataClass = null, $overrideOptions = array(), $reverseAsString = false)
     {
-        if ($form instanceof Forminterface) {
+        if ($form instanceof FormInterface) {
             $entityClass = $form->getConfig()->getOption('data_class');
         } elseif ($form instanceof FormBuilderInterface) {
             $entityClass = $form->getFormConfig()->getOption('data_class');
         } else {
             throw new \InvalidArgumentException(sprintf(
                 '$form must be instance of %s or %s, its class is %s',
-                Forminterface::class,
+                FormInterface::class,
                 FormBuilderInterface::class,
                 get_class($form)
             ));
