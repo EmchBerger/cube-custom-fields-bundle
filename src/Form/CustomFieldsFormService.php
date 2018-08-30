@@ -74,10 +74,14 @@ class CustomFieldsFormService
             }
             $fieldType = $field['type'];
 
+            if (isset($field['field_options'])) {
+                $options = array_merge($options, $field['field_options']);
+            }
+
             if (isset($field['filters']) && Select2EntityType::class !== $fieldType) {
                 // add repository method for filtering specific fieldIds (only makes sense for EntityType fields used as Selects)
                 $filters = $field['filters'];
-                $field['field_options']['query_builder'] = function (EntityRepository $er) use ($filters) {
+                $options['query_builder'] = function (EntityRepository $er) use ($filters) {
                     $qb = $er->createQueryBuilder('customField');
                     foreach ($filters as $field => $value) {
                         $qb->andWhere(sprintf('customField.%s = :%s', $field, $field))->setParameter($field, $value);
@@ -90,11 +94,11 @@ class CustomFieldsFormService
             // define the options
             if (Select2EntityType::class === $fieldType) {
                 // automatically set route and remote parameters
-                $field['field_options']['remote_route'] = 'cube_custom_fields_ajax';
-                $field['field_options']['remote_params']['fieldId'] = $name;
+                $options['remote_route'] = 'cube_custom_fields_ajax';
+                $options['remote_params']['fieldId'] = $name;
 
                 if (isset($field['field_options']['attr']['any_none']) && $field['field_options']['attr']['any_none']) {
-                    $field['field_options']['remote_params']['any_none'] = $field['field_options']['attr']['any_none'];
+                    $options['remote_params']['any_none'] = $field['field_options']['attr']['any_none'];
                 }
             }
 
