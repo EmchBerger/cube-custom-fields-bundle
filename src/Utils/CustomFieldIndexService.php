@@ -84,4 +84,46 @@ class CustomFieldIndexService
         return $header;
     }
 
+    /**
+     * Get the customFields value of all entities.
+     *
+     * Return format:
+     * [
+     *     ['entiy' => cfEntity, 'column' => columnData[]],
+     *      ...
+     * ]
+     *
+     * @param Form              $form    filter form of index page
+     * @param object[]|iterable $entites database entities
+     *
+     * @return mixed[][][] an array of customfield values for each entity
+     */
+    public function getIndexAllValues(Form $form, $entites)
+    {
+        $cfValues = array();
+        foreach ($entites as $key => $element) {
+            $cfValues[$key] = array('entity' => $element, 'column' => $this->getIndexRows($form, $element));
+        }
+
+        return $cfValues;
+    }
+
+    /**
+     * Gets head and all values data.
+     *
+     * @param Form              $form     filter form of index page
+     * @param object[]|iterable $entities database entities
+     *
+     * @return array ['head' => headData, 'data' => values]
+     */
+    public function getCustomFieldsData(Form $form, $entities)
+    {
+        $cfValues = $this->getIndexAllValues($form, $entities);
+        $customFieldData = array(
+            'head' => $this->getHeader($form),
+            'data' => $cfValues,
+        );
+
+        return $customFieldData;
+    }
 }
