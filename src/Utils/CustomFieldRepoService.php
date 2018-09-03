@@ -81,6 +81,24 @@ class CustomFieldRepoService
         return $qb;
     }
 
+    /**
+     * Add an IN-criterion to an existing querybuilder to also allow queryField to be in set of entities referring to given customFields
+     * @param DoctrineQueryBuilder $qb
+     * @param string $queryField
+     * @param string $entityClass
+     * @param array $customFieldIds
+     *
+     * @return DoctrineQueryBuilder $qb
+     */
+    public function addOrWhereInIdsForCustomFieldIds($qb, $queryField, $entityClass, $customFieldIds)
+    {
+        if (count($customFieldIds)) {
+            $qb->orWhere($qb->expr()->in($queryField, $this->getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)->getDQL()));
+        }
+
+        return $qb;
+    }
+
     private function getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)
     {
         $alias = 'entity_' . implode('', $customFieldIds) . mt_rand(0, 1000); //md5($entityClass . implode('_', $customFieldIds)); // make sure the alias is unique in the whole surrounding query (if any)
