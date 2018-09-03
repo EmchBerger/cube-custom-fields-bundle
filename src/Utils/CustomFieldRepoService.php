@@ -75,9 +75,10 @@ class CustomFieldRepoService
      */
     public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
     {
-        $entities = $this->addAnyCustomFieldIdQueryResult($customFieldId, $firstRootAlias, $qb);
-        $qb->andWhere($firstRootAlias . sprintf('.id IN (:any%s)', $this->parameterCount))
-            ->setParameter('any' . $this->parameterCount, $entities);
+        $alias = 'cf' . $this->parameterCount;
+        $qb->leftJoin($firstRootAlias . '.customFields', $alias);
+        $qb->andWhere($alias . '.fieldId = :fieldId' . $this->parameterCount);
+        $qb->setParameter('fieldId' . $this->parameterCount, $customFieldId);
         $this->parameterCount++;
 
         return $qb;
