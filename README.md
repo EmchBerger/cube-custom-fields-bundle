@@ -127,6 +127,7 @@ cube_custom_fields:
                     attr:
                         style: width:100%
                         data-role: none
+                        any_none: any:{not empty},none:{empty} # strings used to identify empty or non-empty custom fields in filters
     # access_rights_table: 'XxBundle:AccessEntity'
 ```
 
