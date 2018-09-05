@@ -76,7 +76,7 @@ class CustomFieldRepoService
     public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
     {
         $alias = 'cf' . $this->parameterCount;
-        $qb->leftJoin($firstRootAlias . '.customFields', $alias);
+        $qb->join($firstRootAlias . '.customFields', $alias);
         $qb->andWhere($alias . '.fieldId = :fieldId' . $this->parameterCount);
         $qb->setParameter('fieldId' . $this->parameterCount, $customFieldId);
         $this->parameterCount++;
