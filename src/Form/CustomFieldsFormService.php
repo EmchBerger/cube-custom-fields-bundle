@@ -91,6 +91,10 @@ class CustomFieldsFormService
                 // automatically set route and remote parameters
                 $field['field_options']['remote_route'] = 'cube_custom_fields_ajax';
                 $field['field_options']['remote_params']['fieldId'] = $name;
+
+                if (isset($field['field_options']['attr']['any_none']) && $field['field_options']['attr']['any_none']) {
+                    $field['field_options']['remote_params']['any_none'] = $field['field_options']['attr']['any_none'];
+                }
             }
 
             if (isset($field['field_options'])) {

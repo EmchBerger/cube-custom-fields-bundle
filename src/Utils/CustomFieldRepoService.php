@@ -14,6 +14,11 @@ class CustomFieldRepoService
     private $configReader;
     private $mr;
 
+    /**
+     * @var int number of usages of parameter (preventing overwrite of previous value)
+     */
+    protected $parameterCount = 0;
+
     public function __construct(ConfigReader $configReader, ManagerRegistry $mr)
     {
         $this->configReader = $configReader;
@@ -38,6 +43,64 @@ class CustomFieldRepoService
         $result = $qb->getQuery()->getScalarResult();
 
         return array_column($result, 'id');
+    }
+
+    /**
+     * @param string $customFieldId
+     * @param string $firstRootAlias
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     *
+     * @return array id of entities, which fulfil any condition
+     */
+    protected function addAnyCustomFieldIdQueryResult($customFieldId, $firstRootAlias, $qb)
+    {
+        $qbCloned = clone $qb;
+        if (!in_array('cf', $qb->getAllAliases())) {
+            $qbCloned->join($firstRootAlias . '.customFields', 'cf');
+        }
+        $qbCloned->andWhere('cf.fieldId = :fieldId')
+            ->setParameter('fieldId', $customFieldId);
+
+        return $qbCloned->getQuery()->getResult();
+    }
+
+    /**
+     * Method looking for records, where any value of custom field is set.
+     *
+     * @param string $customFieldId
+     * @param string $firstRootAlias
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function addAnyCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    {
+        $alias = 'cf' . $this->parameterCount;
+        $qb->join($firstRootAlias . '.customFields', $alias);
+        $qb->andWhere($alias . '.fieldId = :fieldId' . $this->parameterCount);
+        $qb->setParameter('fieldId' . $this->parameterCount, $customFieldId);
+        $this->parameterCount++;
+
+        return $qb;
+    }
+
+    /**
+     * Method looking for records, where no value of custom field is set.
+     *
+     * @param string $customFieldId
+     * @param string $firstRootAlias
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function addNoneCustomFieldId($customFieldId, $firstRootAlias, $qb)
+    {
+        $entities = $this->addAnyCustomFieldIdQueryResult($customFieldId, $firstRootAlias, $qb);
+        $qb->andWhere($firstRootAlias . sprintf('.id NOT IN (:notAny%s)', $this->parameterCount))
+            ->setParameter('notAny' . $this->parameterCount, $entities);
+        $this->parameterCount++;
+
+        return $qb;
     }
 
     /**
@@ -76,6 +139,24 @@ class CustomFieldRepoService
             $qb->andWhere('TRUE = FALSE');
         } else {
             $qb->andWhere($qb->expr()->in($queryField, $this->getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)->getDQL()));
+        }
+
+        return $qb;
+    }
+
+    /**
+     * Add an IN-criterion to an existing querybuilder to also allow queryField to be in set of entities referring to given customFields
+     * @param DoctrineQueryBuilder $qb
+     * @param string $queryField
+     * @param string $entityClass
+     * @param array $customFieldIds
+     *
+     * @return DoctrineQueryBuilder $qb
+     */
+    public function addOrWhereInIdsForCustomFieldIds($qb, $queryField, $entityClass, $customFieldIds)
+    {
+        if (count($customFieldIds)) {
+            $qb->orWhere($qb->expr()->in($queryField, $this->getEntitiesIdsForCustomFieldIdsQb($entityClass, $customFieldIds)->getDQL()));
         }
 
         return $qb;
