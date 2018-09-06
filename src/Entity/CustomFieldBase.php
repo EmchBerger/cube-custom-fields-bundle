@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Base class for custom field tables
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="CubeTools\CubeCustomFieldsBundle\Entity\GeneralCustomFieldRepository")
  * @ORM\Table(name="custom_fields")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn("discr_type", type="string")

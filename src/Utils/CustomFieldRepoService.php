@@ -208,36 +208,12 @@ class CustomFieldRepoService
         $config = $this->configReader->getConfigForFieldId($fieldId);
         $formType = $config['type'];
         $entityClass = EntityMapper::getCustomFieldClass($formType);
-        $simpleQuery = false;
-        switch ($entityClass) {
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField':
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField':
-                $simpleQuery = true;
-                // no break, set $er below
-            case 'CubeTools\CubeCustomFieldsBundle\Entity\DatetimeCustomField':
-                $er = $this->mr->getManager()->getRepository($entityClass);
-                break;
 
-            default:
-                $er = $this->mr->getManager()->getRepository('CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField');
-                break;
-        }
+        $er = $this->mr->getManager()->getRepository($entityClass);
 
         // retrieve the customField entities from the database
         $qb = $er->createQueryBuilder('cf');
-        if ($simpleQuery) {
-            // "simple" custom field entity types
-            $dbField = $entityClass::getStorageFieldName();
-            $qb->andWhere('cf.fieldId = :fieldId')
-                ->andWhere('cf.'.$dbField.' LIKE :object')
-                ->setParameters(array(
-                    'fieldId' => $fieldId,
-                    'object' => '%'.$object.'%',
-                ));
-        } else {
-            // EntityCustomField
-            $er->addFindByObject($qb, 'cf', $object, $fieldId);
-        }
+        $er->addFindByObject($qb, 'cf', $object, $fieldId);
         if ($idsOnly) {
             $qb->select('cf.id');
             $returnVal = $qb->getQuery()->getScalarResult();

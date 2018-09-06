@@ -5,7 +5,7 @@ namespace CubeTools\CubeCustomFieldsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="CubeTools\CubeCustomFieldsBundle\Entity\GeneralCustomFieldRepository")
  */
 class TextCustomField extends CustomFieldBase
 {
