@@ -3,26 +3,12 @@
 namespace CubeTools\CubeCustomFieldsBundle\Entity;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityRepository;
 
 /**
  * EntityCustomFieldRepository
  */
-class EntityCustomFieldRepository extends EntityRepository
+class EntityCustomFieldRepository extends AbstractCustomFieldRepository
 {
-    /**
-     * Finds EntityCustomFields which point to a specific object
-     * @param object $object (DC2 entity)
-     * @param string $fieldId (optional)
-     * @return DoctrineQueryBuilder $qb
-     */
-    public function findByObject($object, $fieldId = null)
-    {
-        $qb = $this->createQueryBuilder('cf');
-        $this->addFindByObject($qb, 'cf', $object, $fieldId);
-        return $qb->getQuery()->getResult();
-    }
-
     public function addFindByObject($qb, $cfAlias, $object, $fieldId)
     {
         $objectClass = str_replace('\\', '\\\\\\\\', ClassUtils::getClass($object));
