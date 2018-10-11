@@ -12,6 +12,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 class CustomFieldsFilterService
 {
+    private $repo;
+
     public function __construct(CustomFieldRepoService $repo)
     {
         $this->repo = $repo;
@@ -67,7 +69,7 @@ class CustomFieldsFilterService
                     $anyNoneUsed = true;
                 }
 
-                if (!$filterVal || !count($filterVal) || $anyNoneUsed) {
+                if (!$filterVal || ($filterVal instanceof \Countable) && !count($filterVal) || $anyNoneUsed) {
                     // we are not interested in empty filters
                     continue;
                 }
