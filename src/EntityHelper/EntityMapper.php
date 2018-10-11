@@ -21,19 +21,18 @@ class EntityMapper
         if (array_key_exists($formClass, self::$map)) {
             return self::$map[$formClass];
         } else {
-            return null;
+            throw new \LogicException(sprintf('FormClass %s is not supported', $formClass));
         }
     }
 
     public static function getFormClass($customFieldClass)
     {
-        foreach (self::$map as $key => $elem) {
-            if ($elem == $customFieldClass) {
-                return $key;
-            }
+        $key = array_search($customFieldClass, self::$map, true);
+        if (false !== $key) {
+            return $key;
+        } else {
+            throw new \LogicException(sprintf('CustomFieldClass %s is not supported.', $customFieldClass));
         }
-
-        return null;
     }
 
     public static function isEntityField($formClass)
