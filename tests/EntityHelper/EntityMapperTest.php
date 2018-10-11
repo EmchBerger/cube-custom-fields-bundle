@@ -17,12 +17,8 @@ class EntityMapperTest extends TestCase
         $cfTa = EntityMapper::getCustomFieldClass($ftTa);
         $this->assertSame('CubeTools\CubeCustomFieldsBundle\Entity\TextareaCustomField', $cfTa, $ftTa);
 
-        try { // currently accept two variants
-            $invalid = EntityMapper::getCustomFieldClass('not known form class');
-            $this->assertSame(null, $invalid);
-        } catch (\LogicException $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(\LogicException::class);
+        EntityMapper::getCustomFieldClass('not known form class');
     }
 
     public function testGetFormClass()
@@ -31,12 +27,8 @@ class EntityMapperTest extends TestCase
         $ftTa = EntityMapper::getFormClass($cfTa);
         $this->assertSame('FOS\CKEditorBundle\Form\Type\CKEditorType', $ftTa, $cfTa);
 
-        try { // currently accept two variants
-            $invalid = EntityMapper::getFormClass('not known custom field class');
-            $this->assertSame(null, $invalid);
-        } catch (\LogicException $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(\LogicException::class);
+        EntityMapper::getFormClass('not known custom field class');
     }
 
     public function testIsEntityField()
