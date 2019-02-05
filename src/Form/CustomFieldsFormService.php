@@ -6,7 +6,8 @@ use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Forminterface;
+use Symfony\Component\Form\FormInterface;
+use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
 class CustomFieldsFormService
 {
@@ -36,14 +37,14 @@ class CustomFieldsFormService
      */
     public function addCustomFields($form, $dataClass = null, $overrideOptions = array(), $reverseAsString = false)
     {
-        if ($form instanceof Forminterface) {
+        if ($form instanceof FormInterface) {
             $entityClass = $form->getConfig()->getOption('data_class');
         } elseif ($form instanceof FormBuilderInterface) {
             $entityClass = $form->getFormConfig()->getOption('data_class');
         } else {
             throw new \InvalidArgumentException(sprintf(
                 '$form must be instance of %s or %s, its class is %s',
-                Forminterface::class,
+                FormInterface::class,
                 FormBuilderInterface::class,
                 get_class($form)
             ));
@@ -73,10 +74,14 @@ class CustomFieldsFormService
             }
             $fieldType = $field['type'];
 
-            if (isset($field['filters']) && $fieldType != 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
+            if (isset($field['field_options'])) {
+                $options = array_merge($options, $field['field_options']);
+            }
+
+            if (isset($field['filters']) && Select2EntityType::class !== $fieldType) {
                 // add repository method for filtering specific fieldIds (only makes sense for EntityType fields used as Selects)
                 $filters = $field['filters'];
-                $field['field_options']['query_builder'] = function (EntityRepository $er) use ($filters) {
+                $options['query_builder'] = function (EntityRepository $er) use ($filters) {
                     $qb = $er->createQueryBuilder('customField');
                     foreach ($filters as $field => $value) {
                         $qb->andWhere(sprintf('customField.%s = :%s', $field, $field))->setParameter($field, $value);
@@ -87,13 +92,13 @@ class CustomFieldsFormService
             }
 
             // define the options
-            if ($fieldType == 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
+            if (Select2EntityType::class === $fieldType) {
                 // automatically set route and remote parameters
-                $field['field_options']['remote_route'] = 'cube_custom_fields_ajax';
-                $field['field_options']['remote_params']['fieldId'] = $name;
+                $options['remote_route'] = 'cube_custom_fields_ajax';
+                $options['remote_params']['fieldId'] = $name;
 
                 if (isset($field['field_options']['attr']['any_none']) && $field['field_options']['attr']['any_none']) {
-                    $field['field_options']['remote_params']['any_none'] = $field['field_options']['attr']['any_none'];
+                    $options['remote_params']['any_none'] = $field['field_options']['attr']['any_none'];
                 }
             }
 
@@ -109,7 +114,7 @@ class CustomFieldsFormService
                 if (!$form->get($name)->hasOption('multiple')) {
                     unset($fieldOverrideOptions['multiple']);
                 }
-                if ($fieldType !== 'Tetranz\Select2EntityBundle\Form\Type\Select2EntityType') {
+                if (Select2EntityType::class !== $fieldType) {
                     unset($fieldOverrideOptions['allow_clear']);
                 }
                 $options = array_replace_recursive($options, $fieldOverrideOptions);

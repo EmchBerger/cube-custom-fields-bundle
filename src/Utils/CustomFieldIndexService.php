@@ -2,7 +2,6 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
-use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Form\Form;
 
 /**
@@ -29,8 +28,7 @@ class CustomFieldIndexService
      */
     public function getIndexRows(Form $filterform, $entity)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        $fieldConfig = $this->configReader->getConfigForEntity($entityClass);
+        $fieldConfig = $this->configReader->getConfigForEntity($entity);
         $indexRows = array();
         // iterate over filterform custom fields
         foreach ($filterform as $filterfield) {
@@ -41,9 +39,6 @@ class CustomFieldIndexService
                 $raw = false;
                 if (array_key_exists($fieldGetter, $fieldConfig) && $fieldConfig[$fieldGetter]['type'] == 'FOS\CKEditorBundle\Form\Type\CKEditorType') {
                     $raw = true;
-                }
-                if (is_object($value) && $value instanceof \DateTimeInterface) {
-                    $value = $value->format('d.m.Y');
                 }
                 $indexRows[] = array(
                     'value' => $value,
@@ -69,14 +64,14 @@ class CustomFieldIndexService
         $header = array();
         foreach ($filterform as $filterfield) {
             if ($filterfield->getConfig()->getOption('translation_domain') == 'custom_fields') {
-                $headerElem = array(
-                    'name' => $filterfield->getName(),
-                    'class' => $filterfield->getName() . 'Col',
-                    'label'=> $filterfield->getConfig()->getOption('label'),
-                );
+                $headerElem = array('name', 'class', 'label');
                 foreach ($options as $optionKey => $option) {
                     $headerElem[$optionKey] = $option;
                 }
+                $headerElem['name'] = $filterfield->getName();
+                $headerElem['class'] = $filterfield->getName().'Col';
+                $headerElem['label'] = $filterfield->getConfig()->getOption('label');
+
                 $header[] = $headerElem;
             }
         }
