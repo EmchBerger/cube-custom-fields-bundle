@@ -17,7 +17,7 @@ class CustomFieldShowService
     public function getDataNonempty($entity)
     {
         $fields = $entity->getNonemptyCustomFields();
-        $entityClass = get_class($entity);
+        $entityClass = $this->configReader->getEntityClass($entity);
 
         $customFields = array();
         foreach ($fields as $fieldId => $field) {
@@ -34,10 +34,9 @@ class CustomFieldShowService
     public function getDataAll($entity)
     {
         $fields = $entity->getNonemptyCustomFields();
-        $entityClass = get_class($entity);
 
         $customFields = array();
-        foreach ($this->configReader->getConfigForEntity($entityClass) as $fieldId => $fieldConfig) {
+        foreach ($this->configReader->getConfigForEntity($entity) as $fieldId => $fieldConfig) {
             if (isset($fields[$fieldId])) {
                 $value = $fields[$fieldId]->getValue();
             } else {
