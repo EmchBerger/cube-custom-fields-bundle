@@ -13,7 +13,7 @@
         "php": ">=5.4",
         "doctrine/orm": "^2.5",
         "symfony/form": "^2.7|^3.0|^4.0",
-        "symfony/framework-bundle": "^2.7|^3.0|4.0"
+        "symfony/framework-bundle": "^2.7|^3.0|^4.0"
     },
     "require-dev": {
         "cubetools/cube-common-develop": "0.*|^1.0.0",
