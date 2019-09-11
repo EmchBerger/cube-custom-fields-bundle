@@ -154,6 +154,30 @@ class EntityCustomField extends CustomFieldBase
     }
 
     /**
+     * Method to figure out, if data in database follow bundle
+     * or no bundle architecture and compares it with doctrine data.
+     * Fixes if data in database follow bundle architecture but doctrine doesn't.
+     *
+     * @param string                      $entityClass argument for $em->getRepository
+     * @param \Doctrine\ORM\EntityManager $em          entity manager
+     *
+     * @return string filtered repository name
+     */
+    public function prepareRepositoryName($entityClass, $em)
+    {
+        $doctrineIsBundleArchitecture = (stripos($em->getMetadataFactory()->getAllMetadata()[0]->name, 'Bundle') !== false);
+        $databaseIsBundleArchitecture = (stripos($entityClass, 'Bundle') !== false);
+
+        if (!$doctrineIsBundleArchitecture && $databaseIsBundleArchitecture) {
+            $repositoryName = str_replace('Bundle', '', $entityClass);
+        } else {
+            $repositoryName = $entityClass;
+        }
+
+        return $repositoryName;
+    }
+
+    /**
      * LifeCycleCallback PostLoad, loading entities from DataBase.
      *
      * @ORM\PostLoad
@@ -164,12 +188,14 @@ class EntityCustomField extends CustomFieldBase
     {
         if ($this->entityValue && $this->entityValue['entityClass']) {
             $em = $event->getEntityManager();
+            $repository = $em->getRepository($this->prepareRepositoryName($this->entityValue['entityClass'], $em));
+
             if (is_array($this->entityValue) && is_array($this->entityValue['entityId'])) {
                 // multiple
-                $entityData = $em->getRepository($this->entityValue['entityClass'])->findById($this->entityValue['entityId']); // in this case, $this->entityValue['entityId'] contains an array of entity IDs
+                $entityData = $repository->findById($this->entityValue['entityId']); // in this case, $this->entityValue['entityId'] contains an array of entity IDs
             } else {
                 // single
-                $entityData = $em->getRepository($this->entityValue['entityClass'])->findOneById($this->entityValue['entityId']);
+                $entityData = $repository->findOneById($this->entityValue['entityId']);
             }
 
             $this->entityData = $entityData;
