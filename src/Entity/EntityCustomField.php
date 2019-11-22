@@ -167,8 +167,9 @@ class EntityCustomField extends CustomFieldBase
     {
         $doctrineIsBundleArchitecture = (stripos($em->getMetadataFactory()->getAllMetadata()[0]->name, 'Bundle') !== false);
         $databaseIsBundleArchitecture = (stripos($entityClass, 'Bundle') !== false);
+        $isCustomField = (stripos($entityClass, 'CubeCustomFieldsBundle') !== false);
 
-        if (!$doctrineIsBundleArchitecture && $databaseIsBundleArchitecture) {
+        if (!$doctrineIsBundleArchitecture && $databaseIsBundleArchitecture && !$isCustomField) {
             $repositoryName = str_replace('Bundle', '', $entityClass);
         } else {
             $repositoryName = $entityClass;

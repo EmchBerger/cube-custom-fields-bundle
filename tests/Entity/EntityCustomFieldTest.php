@@ -70,5 +70,11 @@ class EntityCustomFieldTest extends TestCase
 
         $this->mockEntityManager->setCustomFieldName('AppBundle\\Entity\\User');
         $this->assertEquals('AppBundle\\Entity\\User', $this->testEntity->prepareRepositoryName('AppBundle\\Entity\\User', $this->mockEntityManager));
+
+        $this->mockEntityManager->setCustomFieldName('AppBundle\\Entity\\User');
+        $this->assertEquals('CubeTools\\CubeCustomFieldsBundle\\Entity\\TextCustomField', $this->testEntity->prepareRepositoryName('CubeTools\\CubeCustomFieldsBundle\\Entity\\TextCustomField', $this->mockEntityManager));
+
+        $this->mockEntityManager->setCustomFieldName('App\\Entity\\User');
+        $this->assertEquals('CubeTools\\CubeCustomFieldsBundle\\Entity\\TextCustomField', $this->testEntity->prepareRepositoryName('CubeTools\\CubeCustomFieldsBundle\\Entity\\TextCustomField', $this->mockEntityManager));
     }
 }
