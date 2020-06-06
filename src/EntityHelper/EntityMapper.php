@@ -16,13 +16,27 @@ class EntityMapper
         'Symfony\Bridge\Doctrine\Form\Type\EntityType' => 'CubeTools\CubeCustomFieldsBundle\Entity\EntityCustomField',
     );
 
+    /**
+     * Get the custom field class for the form class
+     *
+     * @param string $formClass
+     *
+     * @return string custom field class
+     */
     public static function getCustomFieldClass($formClass)
     {
-        if (array_key_exists($formClass, self::$map)) {
-            return self::$map[$formClass];
-        } else {
-            throw new \LogicException(sprintf('FormClass %s is not supported', $formClass));
+        $tryFormClass = $formClass;
+        while ($tryFormClass) {
+            if (array_key_exists($tryFormClass, self::$map)) {
+                return self::$map[$tryFormClass];
+            } elseif (class_exists($tryFormClass)) {
+                $tryFormClass = (new $tryFormClass())->getParent();
+            } else {
+                break; // done, unexisting class
+            }
         }
+
+        throw new \LogicException(sprintf('FormClass %s is not supported', $formClass));
     }
 
     public static function getFormClass($customFieldClass)
