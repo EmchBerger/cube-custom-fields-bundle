@@ -4,6 +4,12 @@
 # with aliases from the class name to allow usage in autowire
 
 services:
+    CubeTools\CubeCustomFieldsBundle\Controller\:
+        autowire: true
+        autoconfigure: true
+        resource: '../../Controller/*'
+        public: true
+        tags: ['controller.service_arguments']
     cube_custom_fields.form_fields:
         class: CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService
         arguments:
