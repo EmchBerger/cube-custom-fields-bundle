@@ -137,7 +137,7 @@ Allow to link custom fields to your entity.
 ```php
 class Xxx
 {
-    use \CubeTools\CubeCustomFieldsBundle\CustomFieldsEntityHook;
+    use \CubeTools\CubeCustomFieldsBundle\CustomFieldsEntityTrait;
 }
 ```
 
