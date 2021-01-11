@@ -9,6 +9,8 @@ services:
         arguments:
             - '%cubetools.customfields.entities%'
             - '@doctrine'
+    CubeTools\CubeCustomFieldsBundle\Controller\AjaxFieldController:
+        tags: [controller.service_arguments]
     CubeTools\CubeCustomFieldsBundle\Form\CustomFieldsFormService: '@cube_custom_fields.form_fields'
     CubeTools\CubeCustomFieldsBundle\Filter\:
         autowire: true

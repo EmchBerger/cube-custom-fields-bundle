@@ -2,6 +2,7 @@
 
 namespace CubeTools\CubeCustomFieldsBundle\Controller;
 
+use CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -19,7 +20,7 @@ class AjaxFieldController extends Controller
      * @Route("/", name="cube_custom_fields_ajax")
      * @Method("GET")
      */
-    public function ajaxAction(Request $request)
+    public function ajaxAction(ConfigReader $configReader, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -32,7 +33,7 @@ class AjaxFieldController extends Controller
         }
         $fieldId = $request->query->get('fieldId'); // specifies the field as configured in custom_fields.yml (currently, the fieldId MUST be unique!)
         // get configuration for this fieldId
-        $fieldConfig = $this->get('CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader')->getConfigForFieldId($fieldId);
+        $fieldConfig = $configReader->getConfigForFieldId($fieldId);
         if (array_key_exists('filters', $fieldConfig)) {
             $filters = $fieldConfig['filters'];
         } else {
