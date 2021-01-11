@@ -12,7 +12,12 @@ class ConfigReader
 {
     private $config;
 
-    public function __construct($config)
+    /**
+     * Constructor of service.
+     *
+     * @param array $config Configuration of entities with CustomFields from the bundles configuration
+     */
+    public function __construct(array $config)
     {
         $this->config = $config;
     }
