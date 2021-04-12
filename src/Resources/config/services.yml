@@ -37,3 +37,10 @@ services:
     CubeTools\CubeCustomFieldsBundle\Command\CustomFieldUpdateCommand:
         tags:
             - name: console.command
+    CubeTools\CubeCustomFieldsBundle\Command\MigrateCustomFieldCommand:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $config: '%cubetools.customfields.entities%'
+        tags:
+            - name: console.command
