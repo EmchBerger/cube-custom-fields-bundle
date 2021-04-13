@@ -5,6 +5,8 @@ namespace CubeTools\CubeCustomFieldsBundle\Command;
 use CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader;
 use CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -79,8 +81,13 @@ class CustomFieldMigrateCommand extends ContainerAwareCommand
         $classMetaData = $em->getMetadataFactory()->getMetadataFor($class);
 
         $targetPropertyChoices = [];
+
         foreach ($classMetaData->fieldMappings as $fieldMapping) {
             $targetPropertyChoices[] = $fieldMapping['fieldName'];
+        }
+
+        foreach ($classMetaData->associationMappings as $associationMappings) {
+            $targetPropertyChoices[] = $associationMappings['fieldName'];
         }
 
         $targetPropertyQuestion = new ChoiceQuestion(
@@ -113,14 +120,31 @@ class CustomFieldMigrateCommand extends ContainerAwareCommand
 
         // get busy
         foreach ($em->getRepository($class)->findAll() as $instance) {
-            $source = trim($this->propertyAccessor->getValue($instance, $sourceProperty));
+            $value = trim($this->propertyAccessor->getValue($instance, $sourceProperty));
 
-            if ($source) {
+            if ($value) {
                 if ($valueMap) {
-                    $source = $valueMap[$source];
+                    $value = $valueMap[$value];
                 }
 
-                $this->propertyAccessor->setValue($instance, $targetProperty, $source);
+                try {
+                    $mapping = $classMetaData->getFieldMapping($targetProperty);
+                } catch (MappingException $e) {
+                    $mapping = $classMetaData->getAssociationMapping($targetProperty);
+
+                    if (!\is_object($value)) {
+                        $value = $em->getRepository($mapping['targetEntity'])->findOneById($value);
+                    }
+
+                    if ($mapping['type'] === ClassMetadata::ONE_TO_MANY || $mapping['type'] === ClassMetadata::MANY_TO_MANY) {
+                        $value = \array_merge(
+                            [$value],
+                            $this->propertyAccessor->getValue($instance, $targetProperty)->toArray()
+                        );
+                    }
+                }
+
+                $this->propertyAccessor->setValue($instance, $targetProperty, $value);
                 $em->persist($instance);
             }
         }
