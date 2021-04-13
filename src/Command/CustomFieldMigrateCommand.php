@@ -120,7 +120,7 @@ class CustomFieldMigrateCommand extends ContainerAwareCommand
 
         // get busy
         foreach ($em->getRepository($class)->findAll() as $instance) {
-            $value = trim($this->propertyAccessor->getValue($instance, $sourceProperty));
+            $value = $this->propertyAccessor->getValue($instance, $sourceProperty);
 
             if ($value) {
                 if ($valueMap) {
@@ -129,6 +129,7 @@ class CustomFieldMigrateCommand extends ContainerAwareCommand
 
                 try {
                     $mapping = $classMetaData->getFieldMapping($targetProperty);
+                    $value = \trim($value);
                 } catch (MappingException $e) {
                     $mapping = $classMetaData->getAssociationMapping($targetProperty);
 
