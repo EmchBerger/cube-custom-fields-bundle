@@ -4,6 +4,7 @@ namespace CubeTools\CubeCustomFieldsBundle\Command;
 
 use CubeTools\CubeCustomFieldsBundle\Utils\ConfigReader;
 use CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase;
+use CubeTools\CubeCustomFieldsBundle\Entity\TextCustomField;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -122,6 +123,14 @@ class CustomFieldMigrateCommand extends ContainerAwareCommand
         foreach ($em->getRepository($class)->findAll() as $instance) {
             $value = $this->propertyAccessor->getValue($instance, $sourceProperty);
 
+            if (\is_string($value)) {
+                $value = \trim($value);
+            }
+
+            if ($value instanceof TextCustomField) {
+                $value = \trim($value);
+            }
+
             if ($value) {
                 if ($valueMap) {
                     $value = $valueMap[$value];
@@ -129,7 +138,6 @@ class CustomFieldMigrateCommand extends ContainerAwareCommand
 
                 try {
                     $mapping = $classMetaData->getFieldMapping($targetProperty);
-                    $value = \trim($value);
                 } catch (MappingException $e) {
                     $mapping = $classMetaData->getAssociationMapping($targetProperty);
 
