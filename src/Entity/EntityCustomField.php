@@ -16,7 +16,7 @@ class EntityCustomField extends CustomFieldBase
     /**
      * @var string
      *
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="array")
      */
     private $entityValue;
 
