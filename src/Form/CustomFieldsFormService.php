@@ -3,7 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Form;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
