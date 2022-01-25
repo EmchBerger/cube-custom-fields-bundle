@@ -23,7 +23,7 @@ trait CustomFieldsEntityTrait
      *
      * @var ArrayCollection of CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase
      *
-     * @ORM\ManyToMany(targetEntity="CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase", indexBy="fieldId", cascade="all", orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="CubeTools\CubeCustomFieldsBundle\Entity\CustomFieldBase", indexBy="fieldId", cascade={"all"}, orphanRemoval=true)
      * @ORM\JoinTable(inverseJoinColumns={@ORM\JoinColumn(unique=true)})
      *
      * ManyToMany+JoinTable with unique (= OneToMany) because the owning side can not be on the CustomFields table.
@@ -131,7 +131,7 @@ trait CustomFieldsEntityTrait
     {
         return $this->changedCustomFields;
     }
- 
+
     public function getCustomField($fieldId)
     {
         return CustomFieldsGetSet::getValue($this, $fieldId);
