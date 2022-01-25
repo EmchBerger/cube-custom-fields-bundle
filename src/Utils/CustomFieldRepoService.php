@@ -3,7 +3,7 @@
 namespace CubeTools\CubeCustomFieldsBundle\Utils;
 
 use CubeTools\CubeCustomFieldsBundle\EntityHelper\EntityMapper;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * This service allows to get IDs of customField entities (base entities)

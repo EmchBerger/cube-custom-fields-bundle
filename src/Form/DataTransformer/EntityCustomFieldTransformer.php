@@ -4,7 +4,7 @@ namespace CubeTools\CubeCustomFieldsBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Transformer for EntityCustomField
